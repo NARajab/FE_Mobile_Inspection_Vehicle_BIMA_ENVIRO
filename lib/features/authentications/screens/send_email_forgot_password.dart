@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-class ForgotPassword extends StatelessWidget {
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  final String token;
+class SendEmailForgotPasswordScreen extends StatelessWidget {
+  final TextEditingController _emailController = TextEditingController();
 
-  ForgotPassword({super.key, required this.token});
+  SendEmailForgotPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +11,7 @@ class ForgotPassword extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
             toolbarHeight: 50,
-            title: const Text("Reset Password"),
+            title: const Text("Forgot Password"),
             titleTextStyle: const TextStyle(
               color: Colors.black,
               fontSize: 20,
@@ -46,14 +44,14 @@ class ForgotPassword extends StatelessWidget {
           child: Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Column(
+              child:Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset('assets/fp1.png', height: 200),
+                  Image.asset('assets/fp.png', height: 200),
                   const SizedBox(height: 30.0),
                   const Text(
-                    'Enter your password and confirm password',
+                    'Enter your email to reset your password',
                     style: TextStyle(
                       fontSize: 18.0,
                       color: Color.fromARGB(255, 77, 77, 77),
@@ -73,11 +71,11 @@ class ForgotPassword extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             TextField(
-                              controller: _passwordController,
+                              controller: _emailController,
                               decoration: const InputDecoration(
-                                labelText: 'Password',
+                                labelText: 'Email',
                                 labelStyle: TextStyle(color: Color.fromARGB(255, 77, 77, 77)),
-                                suffixIcon: Icon(Icons.lock),
+                                suffixIcon: Icon(Icons.email),
                                 suffixIconColor: Color.fromARGB(255, 77, 77, 77),
                                 enabledBorder: UnderlineInputBorder(
                                     borderSide: BorderSide(color: Color.fromARGB(255, 77, 77, 77), width: 1.0),
@@ -86,38 +84,12 @@ class ForgotPassword extends StatelessWidget {
                                     borderSide: BorderSide(color: Color.fromARGB(255, 77, 77, 77), width: 2.0),
                                   ),
                               ),
-                              keyboardType: TextInputType.visiblePassword,
-                              obscureText: true,
-                            ),
-                            const SizedBox(height: 20),
-                            TextField(
-                              controller: _confirmPasswordController,
-                              decoration: const InputDecoration(
-                                labelText: 'Confirm Password',
-                                labelStyle: TextStyle(color: Color.fromARGB(255, 77, 77, 77)),
-                                suffixIcon: Icon(Icons.lock),
-                                suffixIconColor: Color.fromARGB(255, 77, 77, 77),
-                                enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Color.fromARGB(255, 77, 77, 77), width: 1.0),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Color.fromARGB(255, 77, 77, 77), width: 2.0),
-                                  ),
-                              ),
-                              keyboardType: TextInputType.visiblePassword,
-                              obscureText: true,
+                              keyboardType: TextInputType.emailAddress,
                             ),
                             const SizedBox(height: 20),
                             ElevatedButton(onPressed: (){
-                              String password = _passwordController.text;
-                              String confirmPassword = _confirmPasswordController.text;
-                              if(password == confirmPassword) {
-                                // Call your backend API to reset the password with the token
-                                print('Password reset with token: $token');
-                              } else {
-                                // Show an error message
-                                print('Passwords do not match');
-                              }
+                              String email = _emailController.text;
+                              print('Password reset email sent to: $email');
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
@@ -147,3 +119,5 @@ class ForgotPassword extends StatelessWidget {
     );
   }
 }
+
+

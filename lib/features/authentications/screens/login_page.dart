@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'send_email_forgot_password.dart';
 import 'forgot_password.dart';
+import '../../home/screens/homepage.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -90,7 +92,7 @@ class LoginScreen extends StatelessWidget {
                                   onTap: (){
                                     Navigator.push(
                                       context, 
-                                      MaterialPageRoute(builder: (context) => ForgotPasswordScreen(),
+                                      MaterialPageRoute(builder: (context) => ForgotPassword(token: '',),
                                       ),
                                     );
                                   },
@@ -109,18 +111,18 @@ class LoginScreen extends StatelessWidget {
                         Center(
                           child: ElevatedButton(
                             onPressed: () {
-                              // String email = _emailController.text;
-                              // String password = _passwordController.text;
-                              // For now, just print the email and password
-                              // print('Email: $email, Password: $password');
+                              Navigator.push(
+                                context, 
+                                MaterialPageRoute(builder: (context) => HomePage(),
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 10),
-                              backgroundColor: const Color(0xFF050C9C),
+                              backgroundColor: const Color(0xFF304FFE),
                               textStyle: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                // shadows: 
                               ),
                               foregroundColor: Colors.white,
                               elevation: 10,
