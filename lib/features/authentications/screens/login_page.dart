@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'send_email_forgot_password.dart';
+// import 'send_email_forgot_password.dart';
 import 'forgot_password.dart';
 import '../../home/screens/homepage.dart';
 
@@ -23,7 +23,7 @@ class LoginScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                Image.asset('assets/logo-bima.png', height: 100,),
+                Image.asset('assets/images/logo-bima.png', height: 100,),
                 const SizedBox(height: 20.0),
                 SizedBox(
                   width: 300,
@@ -38,14 +38,14 @@ class LoginScreen extends StatelessWidget {
                       children: <Widget>[
                         const Align(
                           alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Login to your Account',
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            color: Color.fromARGB(255, 77, 77, 77),
-                            fontWeight: FontWeight.w500
+                          child: Text(
+                            'Login to your Account',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              color: Color.fromARGB(255, 77, 77, 77),
+                              fontWeight: FontWeight.w500
+                            ),
                           ),
-                        ),
                         ),
                         const SizedBox(height: 20.0),
                         Padding(

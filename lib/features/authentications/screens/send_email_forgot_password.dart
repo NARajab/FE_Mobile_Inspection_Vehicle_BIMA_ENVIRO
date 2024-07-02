@@ -48,7 +48,7 @@ class SendEmailForgotPasswordScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset('assets/fp.png', height: 200),
+                  Image.asset('assets/images/fp.png', height: 200),
                   const SizedBox(height: 30.0),
                   const Text(
                     'Enter your email to reset your password',

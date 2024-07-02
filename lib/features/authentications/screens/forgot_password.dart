@@ -50,7 +50,7 @@ class ForgotPassword extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Image.asset('assets/fp1.png', height: 200),
+                  Image.asset('assets/images/fp1.png', height: 200),
                   const SizedBox(height: 30.0),
                   const Text(
                     'Enter your password and confirm password',

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:myapp/features/Setting/screens/setting.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,19 +10,64 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    const HomePageContent(),
+    const HistoryPage(),
+    Container(), // Placeholder for Settings page
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildWidgetOptions(),
-            _buildHistory(),
-          ],
-        ),
+      backgroundColor: Colors.grey[200],
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        showUnselectedLabels: true,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          if (index == 2) {
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => const Setting()));
+          }
+        },
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+}
+
+class HomePageContent extends StatelessWidget {
+  const HomePageContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildHeader(),
+          _buildWidgetOptions(),
+          _buildHistory(),
+        ],
+      ),
     );
   }
 
@@ -39,7 +85,6 @@ class _HomePageState extends State<HomePage> {
               String day = DateFormat('EEEE').format(now);
               String date = DateFormat('dd MMMM yyyy').format(now);
               String time = DateFormat('HH:mm:ss').format(now);
-
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -50,10 +95,9 @@ class _HomePageState extends State<HomePage> {
                       time,
                       textAlign: TextAlign.start,
                       style: const TextStyle(
-                        fontSize: 40,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      ),
+                          fontSize: 40,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                   Row(
@@ -99,22 +143,23 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 4.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildOptionCard('P2H', Icons.settings),
-          _buildOptionCard('KKH', Icons.work),
+          _buildOptionCard('P2H', 'assets/images/p2h.png'),
+          _buildOptionCard('KKH', 'assets/images/kkh.png'),
         ],
       ),
     );
   }
 
-  Widget _buildOptionCard(String title, IconData icon) {
+  Widget _buildOptionCard(String title, String imagePath) {
     return GestureDetector(
       onTap: () {
         // Navigate to corresponding page
       },
       child: Card(
         elevation: 4,
+        shadowColor: Colors.grey.withOpacity(0.5),
         child: Container(
           width: 180,
           height: 150,
@@ -122,11 +167,16 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 48, color: Colors.blue),
+              Image.asset(
+                imagePath,
+                width: 50,
+                height: 50,
+                fit: BoxFit.contain,
+              ),
               const SizedBox(height: 8),
               Text(
                 title,
-                style: const TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -137,30 +187,42 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildHistory() {
     // This is a placeholder. You should replace this with your actual data fetching and displaying logic.
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Last P2H Submission:',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Card(
-            child: ListTile(
-              leading: Icon(Icons.settings),
+            elevation: 4,
+            shadowColor: Colors.grey.withOpacity(0.5),
+            child: const ListTile(
+              leading: Image(
+                image: AssetImage('assets/images/hp2h.png'),
+                width: 35,
+                height: 35,
+              ),
               title: Text('P2H Submission Data'),
               subtitle: Text('Details of the last P2H submission'),
             ),
           ),
-          SizedBox(height: 16),
-          Text(
+          const SizedBox(height: 16),
+          const Text(
             'Last KKH Submission:',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Card(
-            child: ListTile(
-              leading: Icon(Icons.work),
+            elevation: 4,
+            shadowColor: Colors.grey.withOpacity(0.5),
+            child: const ListTile(
+              leading: Image(
+                image: AssetImage('assets/images/hkkh.png'),
+                width: 35,
+                height: 35,
+              ),
               title: Text('KKH Submission Data'),
               subtitle: Text('Details of the last KKH submission'),
             ),
@@ -169,33 +231,15 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
 
-  Widget _buildBottomNavigationBar() {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'P2H',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.work),
-          label: 'KKH',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
-      selectedItemColor: Colors.blue,
-      unselectedItemColor: Colors.grey,
-      showUnselectedLabels: true,
-      onTap: (index) {
-        // Handle navigation on tap
-      },
+class HistoryPage extends StatelessWidget {
+  const HistoryPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('History Page'),
     );
   }
 }

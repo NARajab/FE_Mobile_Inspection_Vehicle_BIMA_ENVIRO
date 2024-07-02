@@ -32,7 +32,7 @@ class _SafetyScreenState extends State<SafetyScreen> {
         },
         children: <Widget>[
           SplashPage(
-            imagePath: 'assets/logo-bima.png',
+            imagePath: 'assets/images/logo-bima.png',
             onFinish: () {
               _pageController.nextPage(
                 duration: const Duration(milliseconds: 300),
@@ -41,7 +41,7 @@ class _SafetyScreenState extends State<SafetyScreen> {
             },
           ),
           SafetyPage(
-            imagePath: 'assets/first.png',
+            imagePath: 'assets/images/first.png',
             title: 'Welcome to P2H and KKH Charging',
             currentPage: _currentPage,
             onNext: () {
@@ -58,7 +58,7 @@ class _SafetyScreenState extends State<SafetyScreen> {
             },
           ),
           SafetyPage(
-            imagePath: 'assets/second.png',
+            imagePath: 'assets/images/second.png',
             title: 'Safety is Most Important',
             currentPage: _currentPage,
             onNext: () {
@@ -300,7 +300,7 @@ class SignInPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('assets/Ellipse.png', height: 250),
+              Image.asset('assets/images/Ellipse.png', height: 250),
               const SizedBox(height: 20),
               const Text(
                 'Create Your',

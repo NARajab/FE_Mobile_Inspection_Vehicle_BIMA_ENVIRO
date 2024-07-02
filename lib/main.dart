@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/authentications/screens/forgot_password.dart';
 import 'features/authentications/screens/first_page.dart';
+import 'features/authentications/screens/login_page.dart';
+import 'features/authentications/screens/send_email_forgot_password.dart';
+import 'features/home/screens/homepage.dart';
+import 'features/Setting/screens/setting.dart';
 import 'package:uni_links2/uni_links.dart';
 import 'dart:async';
 
@@ -63,7 +67,14 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
         fontFamily: 'Poppins',
       ),
-      home: const SafetyScreen(),
+      routes: {
+        '/': (context) => const SafetyScreen(),
+        '/login': (context) => LoginScreen(),
+        '/forgot-password': (context) => ForgotPassword(token: '',),
+        '/reset-password': (context) => SendEmailForgotPasswordScreen(),
+        '/home': (context) => const HomePage(),
+        '/settings': (context) => const Setting()
+      },
     );
   }
 }
