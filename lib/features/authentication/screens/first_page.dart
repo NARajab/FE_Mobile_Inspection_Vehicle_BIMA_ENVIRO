@@ -204,7 +204,7 @@ class SafetyPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   currentPage == 1 ? Container(
-                    width: 16,
+                    width: 23,
                     height: 6,
                     decoration: BoxDecoration(
                       color: Colors.blue,
@@ -220,7 +220,7 @@ class SafetyPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 5),
                   currentPage == 2 ? Container(
-                    width: 16,
+                    width: 23,
                     height: 6,
                     decoration: BoxDecoration(
                       color: Colors.blue,

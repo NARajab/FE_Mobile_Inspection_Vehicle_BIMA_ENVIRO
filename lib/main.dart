@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/authentications/screens/forgot_password.dart';
-import 'features/authentications/screens/first_page.dart';
-import 'features/authentications/screens/login_page.dart';
-import 'features/authentications/screens/send_email_forgot_password.dart';
+import 'package:myapp/features/Setting/screens/change_password.dart';
+import 'package:myapp/features/Setting/screens/profile.dart';
+import 'package:myapp/features/authentication/screens/forgot_password.dart';
+import 'package:myapp/features/history/screens/history.dart';
+import 'package:myapp/features/home/screens/kkh.dart';
+import 'package:myapp/features/home/screens/p2h/excavator/postscript.dart';
+import 'package:myapp/features/home/screens/p2h/excavator/pphEx.dart';
+import 'package:myapp/features/home/screens/p2h/excavator/timesheet.dart';
+import 'package:myapp/features/home/screens/p2h/pph.dart';
+import 'package:myapp/features/home/screens/p2h/pphBl.dart';
+import 'package:myapp/features/home/screens/p2h/pphBs.dart';
+import 'package:myapp/features/home/screens/p2h/pphDt.dart';
+import 'package:myapp/features/home/screens/p2h/pphLv.dart';
+import 'features/authentication/screens/first_page.dart';
+import 'features/authentication/screens/login_page.dart';
+import 'features/authentication/screens/send_email_forgot_password.dart';
 import 'features/home/screens/homepage.dart';
 import 'features/Setting/screens/setting.dart';
 import 'package:uni_links2/uni_links.dart';
 import 'dart:async';
+import 'dart:io';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +38,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _initDeepLinkListener();
+    if (Platform.isAndroid || Platform.isIOS) {
+      _initDeepLinkListener();
+    }
   }
 
   @override
@@ -69,11 +84,23 @@ class _MyAppState extends State<MyApp> {
       ),
       routes: {
         '/': (context) => const SafetyScreen(),
-        '/login': (context) => LoginScreen(),
+        '/login': (context) => const LoginScreen(),
         '/forgot-password': (context) => ForgotPassword(token: '',),
         '/reset-password': (context) => SendEmailForgotPasswordScreen(),
         '/home': (context) => const HomePage(),
-        '/settings': (context) => const Setting()
+        '/history': (context) => const HistoryScreen(),
+        '/settings': (context) => const SettingScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/change-password': (context) => const ChangePasswordScreen(),
+        '/p2h': (context) => p2hScreen(),
+        '/kkh' : (context) => const KkhScreen(),
+        '/blForm' : (context) => const p2hBlScreen(),
+        '/dtForm' : (context) => const p2hDtScreen(),
+        '/lvFrom' : (context) => const p2hLvScreen(),
+        '/bsForm' : (context) => const p2hBsScreen(),
+        '/exForm' : (context) => const p2hExScreen(),
+        '/timesheet' : (context) => const TimesheetScreen(),
+        '/postscript' : (context) => PostscriptScreen()
       },
     );
   }
