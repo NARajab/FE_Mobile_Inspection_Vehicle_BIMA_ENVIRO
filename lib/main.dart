@@ -17,6 +17,7 @@ import 'features/authentication/screens/login_page.dart';
 import 'features/authentication/screens/send_email_forgot_password.dart';
 import 'features/home/screens/homepage.dart';
 import 'features/Setting/screens/setting.dart';
+// ignore: depend_on_referenced_packages
 import 'package:uni_links2/uni_links.dart';
 import 'dart:async';
 import 'dart:io';
@@ -55,7 +56,6 @@ class _MyAppState extends State<MyApp> {
         _handleDeepLink(link);
       }
     }, onError: (err) {
-      print('Failed to receive link: $err');
     });
   }
 
@@ -85,8 +85,8 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => const SafetyScreen(),
         '/login': (context) => const LoginScreen(),
-        '/forgot-password': (context) => ForgotPassword(token: '',),
-        '/reset-password': (context) => SendEmailForgotPasswordScreen(),
+        '/forgot-password': (context) => const ForgotPassword(token: '',),
+        '/reset-password': (context) => const SendEmailForgotPasswordScreen(),
         '/home': (context) => const HomePage(),
         '/history': (context) => const HistoryScreen(),
         '/settings': (context) => const SettingScreen(),

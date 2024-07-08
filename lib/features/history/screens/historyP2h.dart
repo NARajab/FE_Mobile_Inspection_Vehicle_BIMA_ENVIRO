@@ -9,7 +9,7 @@ class HistoryP2hScreen extends StatelessWidget {
   final String idVehicle;
   final String date;
 
-  const HistoryP2hScreen({Key? key, required this.idVehicle, required this.date}) : super(key: key);
+  const HistoryP2hScreen({super.key, required this.idVehicle, required this.date});
 
   Widget _buildTemplate(String idVehicle, String date, String entry) {
     switch (idVehicle) {
@@ -21,10 +21,10 @@ class HistoryP2hScreen extends StatelessWidget {
         return ExcavatorTemplate(date: date, entry: entry);
       case 'Light Vehicle':
         return LightVehicleTemplate(date: date, entry: entry);
-      case 'Bus':
+      case 'Sarana Bus':
         return BusTemplate(date: date, entry: entry);
       default:
-        return Container(); // Handle default case or error state
+        return Container();
     }
   }
 

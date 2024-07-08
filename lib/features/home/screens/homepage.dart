@@ -1,7 +1,6 @@
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/widgets.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:myapp/features/Setting/screens/setting.dart';
 import 'package:myapp/features/history/screens/history.dart';

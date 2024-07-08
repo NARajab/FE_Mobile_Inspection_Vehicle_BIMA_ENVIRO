@@ -5,10 +5,10 @@ class ExcavatorTemplate extends StatelessWidget {
   final String entry;
 
   const ExcavatorTemplate({
-    Key? key,
+    super.key,
     required this.date,
     required this.entry,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

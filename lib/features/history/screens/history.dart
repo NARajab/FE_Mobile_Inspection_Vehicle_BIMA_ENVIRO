@@ -100,7 +100,7 @@ class P2HHistoryScreen extends StatelessWidget {
           ),
         ),GestureDetector(
           onTap: () {
-            navigateToHistoryP2h(context, 'Saran Bus', '2024-07-05');
+            navigateToHistoryP2h(context, 'Sarana Bus', '2024-07-05');
           },
           child: const Card(
             elevation: 3,
@@ -127,7 +127,7 @@ class P2HHistoryScreen extends StatelessWidget {
 }
 
 class KKHHistoryScreen extends StatelessWidget {
-  const KKHHistoryScreen({Key? key}) : super(key: key);
+  const KKHHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

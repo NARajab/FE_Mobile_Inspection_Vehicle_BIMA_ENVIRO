@@ -94,10 +94,10 @@ class SplashPage extends StatefulWidget {
   final VoidCallback onFinish;
 
   const SplashPage({
-    Key? key,
+    super.key,
     required this.imagePath,
     required this.onFinish,
-  }) : super(key: key);
+  });
 
   @override
   _SplashPageState createState() => _SplashPageState();
@@ -326,7 +326,7 @@ class SignInPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       PageRouteBuilder(
-                        pageBuilder: (_, __, ___) => LoginScreen(),
+                        pageBuilder: (_, __, ___) => const LoginScreen(),
                         transitionsBuilder: (_, anim, __, child) {
                           return FadeTransition(
                             opacity: anim,

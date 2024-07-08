@@ -26,11 +26,11 @@ class _KkhScreenState extends State<KkhScreen> {
 
   // Function to submit data
   void submitData() {
-    final String jamPulangKerja = jamPulangKerjaController.text;
-    final String jamTidur = jamTidurController.text;
-    final String jamBangunTidur = jamBangunTidurController.text;
-    final String jamBerangkatKerja = jamBerangkatKerjaController.text;
-    final String keluhanFisikMental = keluhanFisikMentalController.text;
+    // final String jamPulangKerja = jamPulangKerjaController.text;
+    // final String jamTidur = jamTidurController.text;
+    // final String jamBangunTidur = jamBangunTidurController.text;
+    // final String jamBerangkatKerja = jamBerangkatKerjaController.text;
+    // final String keluhanFisikMental = keluhanFisikMentalController.text;
 
     // Here you can add the logic to save the data
     // For example, you can send it to a backend or save it locally
