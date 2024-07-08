@@ -189,7 +189,7 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -198,7 +198,7 @@ class _HomePageContentState extends State<HomePageContent> {
               ],
             ),
           ),
-          const SizedBox(height: 0),
+          const SizedBox(height: 8.0),
         ],
       ),
     );
@@ -228,7 +228,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
   Widget _buildWidgetOptions(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -258,8 +258,8 @@ class _HomePageContentState extends State<HomePageContent> {
         elevation: 4,
         shadowColor: Colors.grey.withOpacity(0.5),
         child: Container(
-          width: 150,
-          height: 150,
+          width: 170,
+          height: 170,
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -301,7 +301,7 @@ class _HomePageContentState extends State<HomePageContent> {
   Widget _buildSubmissionItem(String title, String subtitle, IconData icon, Color iconColor) {
     return Card(
       elevation: 4,
-      shadowColor: Colors.grey.withOpacity(0.5),
+      shadowColor: Colors.grey.withOpacity(0.7),
       child: ListTile(
         leading: Icon(icon, size: 35, color: iconColor),
         title: Text(title),

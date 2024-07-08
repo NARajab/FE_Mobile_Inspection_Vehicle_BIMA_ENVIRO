@@ -19,6 +19,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -31,11 +32,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const SizedBox(height: 30.0),
                 const Text(
                   "Reset Your Password",
                   style: TextStyle(
-                    fontSize: 22.0,
+                    fontSize: 24.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -43,15 +43,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 const Text(
                   "Enter your new password and confirm it.",
                   style: TextStyle(
-                    fontSize: 12.0,
+                    fontSize: 14.0,
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 40.0),
+                const SizedBox(height: 90.0),
                 Center(
                   child: Image.asset(
                     'assets/images/rp.png',
-                    height: 150.0,
+                    height: 320.0,
                   ),
                 ),
                 const SizedBox(height: 30.0),
@@ -71,7 +71,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 3.0),
+                        const SizedBox(height: 8.0),
                         TextField(
                           controller: _passwordController,
                           decoration: InputDecoration(
@@ -105,7 +105,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 3.0),
+                        const SizedBox(height: 8.0),
                         TextField(
                           controller: _confirmPasswordController,
                           decoration: InputDecoration(

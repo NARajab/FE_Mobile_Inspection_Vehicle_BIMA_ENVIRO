@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text(
                   "Hi, Welcome Back! 👋",
                   style: TextStyle(
-                    fontSize: 22.0,
+                    fontSize: 24.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -43,15 +43,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text(
                   "Hello again, you've been missed!",
                   style: TextStyle(
-                    fontSize: 12.0,
+                    fontSize: 14.0,
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 40.0),
+                const SizedBox(height: 100.0),
                 Center( // Center the image
                   child: Image.asset(
                     'assets/images/admin.png',
-                    height: 150.0,
+                    height: 250.0,
                   ),
                 ),
                 const SizedBox(height: 30.0),

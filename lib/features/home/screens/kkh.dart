@@ -9,11 +9,15 @@ class KkhScreen extends StatefulWidget {
 
 class _KkhScreenState extends State<KkhScreen> {
   // Controllers for input fields
-  final TextEditingController jamPulangKerjaController = TextEditingController();
+  final TextEditingController jamPulangKerjaController =
+      TextEditingController();
   final TextEditingController jamTidurController = TextEditingController();
-  final TextEditingController jamBangunTidurController = TextEditingController();
-  final TextEditingController jamBerangkatKerjaController = TextEditingController();
-  final TextEditingController keluhanFisikMentalController = TextEditingController();
+  final TextEditingController jamBangunTidurController =
+      TextEditingController();
+  final TextEditingController jamBerangkatKerjaController =
+      TextEditingController();
+  final TextEditingController keluhanFisikMentalController =
+      TextEditingController();
 
   // Function to clear all input fields
   void clearFields() {
@@ -26,11 +30,11 @@ class _KkhScreenState extends State<KkhScreen> {
 
   // Function to submit data
   void submitData() {
-    final String jamPulangKerja = jamPulangKerjaController.text;
-    final String jamTidur = jamTidurController.text;
-    final String jamBangunTidur = jamBangunTidurController.text;
-    final String jamBerangkatKerja = jamBerangkatKerjaController.text;
-    final String keluhanFisikMental = keluhanFisikMentalController.text;
+    // final String jamPulangKerja = jamPulangKerjaController.text;
+    // final String jamTidur = jamTidurController.text;
+    // final String jamBangunTidur = jamBangunTidurController.text;
+    // final String jamBerangkatKerja = jamBerangkatKerjaController.text;
+    // final String keluhanFisikMental = keluhanFisikMentalController.text;
 
     // Here you can add the logic to save the data
     // For example, you can send it to a backend or save it locally
@@ -53,10 +57,7 @@ class _KkhScreenState extends State<KkhScreen> {
         elevation: 5,
         shadowColor: Colors.black,
         titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w400
-        ),
+            color: Colors.white, fontSize: 20, fontWeight: FontWeight.w400),
         toolbarHeight: 45,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
