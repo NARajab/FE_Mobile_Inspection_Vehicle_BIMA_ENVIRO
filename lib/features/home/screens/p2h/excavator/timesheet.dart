@@ -131,7 +131,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(label),
-          content: Container(
+          content: SizedBox(
             width: double.maxFinite,
             child: ListView.builder(
               shrinkWrap: true,
@@ -258,7 +258,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                       ),
                       child: Text(
                         selectedKodeDelay != null
-                            ? kodeMaterialOptions.firstWhere((option) => option['code'] == selectedKodeMaterial)['code']! + ' = ' + kodeMaterialOptions.firstWhere((option) => option['code'] == selectedKodeMaterial)['description']!
+                            ? '${kodeMaterialOptions.firstWhere((option) => option['code'] == selectedKodeMaterial)['code']!} = ${kodeMaterialOptions.firstWhere((option) => option['code'] == selectedKodeMaterial)['description']!}'
                             : '',
                       ),
                     ),
@@ -305,7 +305,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                       ),
                       child: Text(
                         selectedKodeDelay != null
-                            ? kodeDelayOptions.firstWhere((option) => option['code'] == selectedKodeDelay)['code']! + ' = ' + kodeDelayOptions.firstWhere((option) => option['code'] == selectedKodeDelay)['description']!
+                            ? '${kodeDelayOptions.firstWhere((option) => option['code'] == selectedKodeDelay)['code']!} = ${kodeDelayOptions.firstWhere((option) => option['code'] == selectedKodeDelay)['description']!}'
                             : '',
                       ),
                     ),
@@ -339,7 +339,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                       ),
                       child: Text(
                         selectedKodeIdle != null
-                            ? kodeIdleOptions.firstWhere((option) => option['code'] == selectedKodeIdle)['code']! + ' = ' + kodeIdleOptions.firstWhere((option) => option['code'] == selectedKodeIdle)['description']!
+                            ? '${kodeIdleOptions.firstWhere((option) => option['code'] == selectedKodeIdle)['code']!} = ${kodeIdleOptions.firstWhere((option) => option['code'] == selectedKodeIdle)['description']!}'
                             : '',
                       ),
                     ),
@@ -368,7 +368,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                       ),
                       child: Text(
                         selectedKodeRepair != null
-                            ? kodeRepairOptions.firstWhere((option) => option['code'] == selectedKodeRepair)['code']! + ' = ' + kodeRepairOptions.firstWhere((option) => option['code'] == selectedKodeRepair)['description']!
+                            ? '${kodeRepairOptions.firstWhere((option) => option['code'] == selectedKodeRepair)['code']!} = ${kodeRepairOptions.firstWhere((option) => option['code'] == selectedKodeRepair)['description']!}'
                             : '',
                       ),
                     ),
@@ -400,7 +400,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                 ),
                 child: Text(
                   selectedKodeAktivitas != null
-                      ? kodeAktivitasOptions.firstWhere((option) => option['code'] == selectedKodeAktivitas)['code']! + ' = ' + kodeAktivitasOptions.firstWhere((option) => option['code'] == selectedKodeAktivitas)['description']!
+                      ? '${kodeAktivitasOptions.firstWhere((option) => option['code'] == selectedKodeAktivitas)['code']!} = ${kodeAktivitasOptions.firstWhere((option) => option['code'] == selectedKodeAktivitas)['description']!}'
                       : '',
                 ),
               ),

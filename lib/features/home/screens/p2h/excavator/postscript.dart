@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 class PostscriptScreen extends StatelessWidget {
   final TextEditingController postscriptController = TextEditingController();
+  final TextEditingController stopOperasiJamController = TextEditingController();
+
+  PostscriptScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +17,7 @@ class PostscriptScreen extends StatelessWidget {
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
-          fontWeight: FontWeight.w400
+          fontWeight: FontWeight.w400,
         ),
         toolbarHeight: 45,
         leading: IconButton(
@@ -59,6 +62,29 @@ class PostscriptScreen extends StatelessWidget {
               keyboardType: TextInputType.multiline,
             ),
             const SizedBox(height: 20),
+            const Text(
+              'Stop Operasi Jam',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                _selectTime(context, stopOperasiJamController);
+              },
+              child: AbsorbPointer(
+                child: TextField(
+                  controller: stopOperasiJamController,
+                  decoration: const InputDecoration(
+                    labelText: 'Jam Stop Operasi',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Implement submit logic here
@@ -81,5 +107,15 @@ class PostscriptScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      controller.text = picked.format(context);
+    }
   }
 }

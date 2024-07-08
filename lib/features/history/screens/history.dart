@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/history/screens/historyP2h.dart';
+import 'package:myapp/features/history/screens/historyKkh.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -100,7 +101,7 @@ class P2HHistoryScreen extends StatelessWidget {
           ),
         ),GestureDetector(
           onTap: () {
-            navigateToHistoryP2h(context, 'Saran Bus', '2024-07-05');
+            navigateToHistoryP2h(context, 'Sarana Bus', '2024-07-05');
           },
           child: const Card(
             elevation: 3,
@@ -127,29 +128,68 @@ class P2HHistoryScreen extends StatelessWidget {
 }
 
 class KKHHistoryScreen extends StatelessWidget {
-  const KKHHistoryScreen({Key? key}) : super(key: key);
+  const KKHHistoryScreen({super.key});
+
+  final List<Map<String, String>> kkhHistoryData = const [
+    {'day': 'Monday', 'date': '10 January 2024', 'jamPulangKerja': '18:00', 'jamTidur': '22:00', 'jamBangunTidur': '06:00', 'jamBerangkat': '08:00', 'keluhan': 'Fit to work'},
+    {'day': 'Tuesday', 'date': '11 January 2024', 'jamPulangKerja': '17:00', 'jamTidur': '21:00', 'jamBangunTidur': '05:00', 'jamBerangkat': '07:00', 'keluhan': 'Sakit Kepala'},
+    // Add more history items as needed
+  ];
 
   @override
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.all(10.0),
-      children: const [
-        Card(
-          elevation: 3,
-          child: ListTile(
-            title: Text('01 April 2024'),
-            subtitle: Text('Description for KKH item 1'),
+      children: kkhHistoryData.map((historyItem) {
+        return GestureDetector(
+          onTap: () {
+            navigateToHistoryKkh(
+              context,
+              day: historyItem['day']!,
+              date: historyItem['date']!,
+              jamPulangKerja: historyItem['jamPulangKerja']!,
+              jamTidur: historyItem['jamTidur']!,
+              jamBangunTidur: historyItem['jamBangunTidur']!,
+              jamBerangkat: historyItem['jamBerangkat']!,
+              keluhan: historyItem['keluhan']!,
+            );
+          },
+          child: Card(
+            elevation: 3,
+            child: ListTile(
+              title: Text(historyItem['date']!),
+              subtitle: Text(historyItem['keluhan']!),
+            ),
           ),
-        ),
-        Card(
-          elevation: 3,
-          child: ListTile(
-            title: Text('02 April 2024'),
-            subtitle: Text('Description for KKH item 2'),
-          ),
-        ),
-        // Add more Card widgets for additional history items
-      ],
+        );
+      }).toList(),
     );
   }
 }
+
+void navigateToHistoryKkh(
+    BuildContext context, {
+      required String day,
+      required String date,
+      required String jamPulangKerja,
+      required String jamTidur,
+      required String jamBangunTidur,
+      required String jamBerangkat,
+      required String keluhan,
+    }) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => HistoryKkhScreen(
+        day: day,
+        date: date,
+        jamPulangKerja: jamPulangKerja,
+        jamTidur: jamTidur,
+        jamBangunTidur: jamBangunTidur,
+        jamBerangkat: jamBerangkat,
+        keluhan: keluhan,
+      ),
+    ),
+  );
+}
+

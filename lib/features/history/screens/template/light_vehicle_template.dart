@@ -100,7 +100,7 @@ class LightVehicleTemplate extends StatelessWidget {
           DataRow(cells: [
             DataCell(Text('1')),
             DataCell(Text('Drv')),
-            DataCell(Text('Ban & Baut roda')),
+            DataCell(Text('Kondisi Ban & Baut roda')),
             DataCell(Text('AA')),
             DataCell(Text('Baik')),
             DataCell(Text('')),
