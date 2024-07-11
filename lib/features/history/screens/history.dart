@@ -22,8 +22,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   ];
 
   final List<Map<String, String>> kkhHistoryData = [
-    {'day': 'Monday', 'date': '10 January 2024', 'keluhan': 'Fit to work'},
-    {'day': 'Tuesday', 'date': '11 January 2024', 'keluhan': 'Sakit Kepala'},
+    {'day': 'Monday', 'date': '10 January 2024', 'subtitle': 'Fit to work'},
+    {'day': 'Tuesday', 'date': '11 January 2024', 'subtitle': 'Sakit Kepala'},
     // Add more history items as needed
   ];
 
@@ -83,6 +83,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildP2HTab() {
+    List<Map<String, String>> filteredData = p2hHistoryData.where((item) =>
+    item['date']!.toLowerCase().contains(filterText) ||
+        item['subtitle']!.toLowerCase().contains(filterText)
+    ).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -102,13 +107,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         Expanded(
-          child: ListView(
+          child: filteredData.isEmpty
+              ? const Center(child: Text('No results found'))
+              : ListView(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            children: p2hHistoryData
-                .where((item) =>
-            item['date']!.toLowerCase().contains(filterText) ||
-                item['subtitle']!.toLowerCase().contains(filterText))
-                .map((item) => GestureDetector(
+            children: filteredData.map((item) => GestureDetector(
               onTap: () {
                 navigateToHistoryP2h(
                   context,
@@ -124,15 +127,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   subtitle: Text(item['subtitle']!),
                 ),
               ),
-            ))
-                .toList(),
+            )).toList(),
           ),
         ),
       ],
     );
   }
 
+
+
   Widget _buildKKHTab() {
+    List<Map<String, String>> filteredData = kkhHistoryData.where((item) =>
+    item['day']!.toLowerCase().contains(filterText) ||
+        item['date']!.toLowerCase().contains(filterText) ||
+        (item['keluhan'] != null && item['keluhan']!.toLowerCase().contains(filterText))
+    ).toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -152,40 +162,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         Expanded(
-          child: ListView(
+          child: filteredData.isEmpty
+              ? const Center(child: Text('No results found'))
+              : ListView(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            children: kkhHistoryData
-                .where((item) =>
-            item['day']!.toLowerCase().contains(filterText) ||
-                item['date']!.toLowerCase().contains(filterText) ||
-                item['keluhan']!.toLowerCase().contains(filterText))
-                .map((historyItem) => GestureDetector(
+            children: filteredData.map((historyItem) => GestureDetector(
               onTap: () {
                 navigateToHistoryKkh(
-                  context,
-                  day: historyItem['day']!,
-                  date: historyItem['date']!,
-                  jamPulangKerja: '18:00',
-                  jamTidur: '22:00',
-                  jamBangunTidur: '06:00',
-                  jamBerangkat: '08:00',
-                  keluhan: historyItem['keluhan']!,
+                    context,
+                    day: historyItem['day']!,
+                    date: historyItem['date']!,
+                    jamPulangKerja: '18:00',
+                    jamTidur: '22:00',
+                    jamBangunTidur: '06:00',
+                    jamBerangkat: '08:00',
+                    keluhan: historyItem['subtitle']!,
+                    role: 'driver'
                 );
               },
               child: Card(
                 elevation: 3,
                 child: ListTile(
                   title: Text(historyItem['date']!),
-                  subtitle: Text(historyItem['keluhan']!),
+                  subtitle: Text(historyItem['subtitle']!),
                 ),
               ),
-            ))
-                .toList(),
+            )).toList(),
           ),
         ),
       ],
     );
   }
+
+
 
   void navigateToHistoryP2h(
       BuildContext context, String idVehicle, String date, String role) {
@@ -207,6 +216,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         required String jamBangunTidur,
         required String jamBerangkat,
         required String keluhan,
+        required String role
       }) {
     Navigator.push(
       context,
@@ -219,6 +229,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           jamBangunTidur: jamBangunTidur,
           jamBerangkat: jamBerangkat,
           keluhan: keluhan,
+          role: role
         ),
       ),
     );
