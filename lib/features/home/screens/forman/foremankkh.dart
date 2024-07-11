@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import '../../../history/screens/historyKkh.dart';
 
 class ForemanKkh extends StatefulWidget {
   const ForemanKkh({super.key});
@@ -12,11 +14,65 @@ class _ForemanKkhState extends State<ForemanKkh> {
   bool isSearching = false;
 
   final List<Map<String, String>> data = [
-    {'title': '01 April 2024 - Asep', 'subtitle': 'Fit to work', 'idVehicle': 'Bulldozer', 'date': '2024-07-06', 'role': 'foreman'},
-    {'title': '02 April 2024 - Kurniawan', 'subtitle': 'Fit to work', 'idVehicle': 'Dump Truck', 'date': '2024-07-05', 'role': 'foreman'},
-    {'title': '02 April 2024 - Kusep', 'subtitle': 'Fit to work', 'idVehicle': 'Light Vehicle', 'date': '2024-07-05', 'role': 'foreman'},
-    {'title': '02 April 2024 - Hermawan', 'subtitle': 'Fit to work', 'idVehicle': 'Sarana Bus', 'date': '2024-07-05', 'role': 'foreman'},
+    {
+      'name': 'Asep',
+      'date': '2024-07-06',
+      'role': 'foreman',
+      'day': 'Monday',
+      'jamPulangKerja': '18:00',
+      'jamTidur': '22:00',
+      'jamBangunTidur': '06:00',
+      'jamBerangkat': '07:00',
+      'subtitle': 'Fit to work',
+    },
+    {
+      'name': 'Kurniawan',
+      'date': '2024-07-05',
+      'role': 'foreman',
+      'day': 'Tuesday',
+      'jamPulangKerja': '17:00',
+      'jamTidur': '21:00',
+      'jamBangunTidur': '05:00',
+      'jamBerangkat': '06:00',
+      'subtitle': 'Headache',
+    },
+    {
+      'name': 'Kusep',
+      'date': '2024-07-05',
+      'role': 'foreman',
+      'day': 'Tuesday',
+      'jamPulangKerja': '17:30',
+      'jamTidur': '22:30',
+      'jamBangunTidur': '06:30',
+      'jamBerangkat': '07:30',
+      'subtitle': 'Tiredness',
+    },
+    {
+      'name': 'Hermawan',
+      'date': '2024-07-05',
+      'role': 'foreman',
+      'day': 'Tuesday',
+      'jamPulangKerja': '17:45',
+      'jamTidur': '21:45',
+      'jamBangunTidur': '05:45',
+      'jamBerangkat': '06:45',
+      'subtitle': 'Fit to work',
+    },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _updateTitles();
+  }
+
+  void _updateTitles() {
+    for (var item in data) {
+      final date = DateTime.parse(item['date']!);
+      final formattedDate = DateFormat('dd MMMM yyyy').format(date);
+      item['title'] = '$formattedDate - ${item['name']}';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,38 +136,39 @@ class _ForemanKkhState extends State<ForemanKkh> {
             item['subtitle']!.toLowerCase().contains(filterText))
             .map((item) => _buildCard(
           context,
-          item['title']!,
-          item['subtitle']!,
-          item['idVehicle']!,
-          item['date']!,
-          item['role']!,
+          item,
         ))
             .toList(),
       ),
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, String subtitle, String idVehicle, String date, String role) {
+  Widget _buildCard(BuildContext context, Map<String, String> item) {
     return GestureDetector(
-      // onTap: () {
-      //   navigateToForemanValidationP2h(context, idVehicle, date, role);
-      // },
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HistoryKkhScreen(
+              day: item['day']!,
+              date: item['date']!,
+              jamPulangKerja: item['jamPulangKerja']!,
+              jamTidur: item['jamTidur']!,
+              jamBangunTidur: item['jamBangunTidur']!,
+              jamBerangkat: item['jamBerangkat']!,
+              keluhan: item['subtitle']!,
+              role: item['role']!,
+            ),
+          ),
+        );
+      },
       child: Card(
         elevation: 3,
         child: ListTile(
-          title: Text(title),
-          subtitle: Text(subtitle),
+          title: Text(item['title']!),
+          subtitle: Text(item['subtitle']!),
         ),
       ),
     );
   }
 }
-
-// void navigateToForemanValidationP2h(BuildContext context, String idVehicle, String date, String role) {
-//   Navigator.push(
-//     context,
-//     MaterialPageRoute(
-//       builder: (context) => Foremanvalidationp2hScreen(idVehicle: idVehicle, date: date, role: role),
-//     ),
-//   );
-// }

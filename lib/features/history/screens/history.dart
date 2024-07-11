@@ -22,8 +22,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   ];
 
   final List<Map<String, String>> kkhHistoryData = [
-    {'day': 'Monday', 'date': '10 January 2024', 'keluhan': 'Fit to work'},
-    {'day': 'Tuesday', 'date': '11 January 2024', 'keluhan': 'Sakit Kepala'},
+    {'day': 'Monday', 'date': '10 January 2024', 'subtitle': 'Fit to work'},
+    {'day': 'Tuesday', 'date': '11 January 2024', 'subtitle': 'Sakit Kepala'},
     // Add more history items as needed
   ];
 
@@ -169,14 +169,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   jamTidur: '22:00',
                   jamBangunTidur: '06:00',
                   jamBerangkat: '08:00',
-                  keluhan: historyItem['keluhan']!,
+                  keluhan: historyItem['subtitle']!,
+                  role: 'driver'
                 );
               },
               child: Card(
                 elevation: 3,
                 child: ListTile(
                   title: Text(historyItem['date']!),
-                  subtitle: Text(historyItem['keluhan']!),
+                  subtitle: Text(historyItem['subtitle']!),
                 ),
               ),
             ))
@@ -207,6 +208,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         required String jamBangunTidur,
         required String jamBerangkat,
         required String keluhan,
+        required String role
       }) {
     Navigator.push(
       context,
@@ -219,6 +221,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           jamBangunTidur: jamBangunTidur,
           jamBerangkat: jamBerangkat,
           keluhan: keluhan,
+          role: role
         ),
       ),
     );

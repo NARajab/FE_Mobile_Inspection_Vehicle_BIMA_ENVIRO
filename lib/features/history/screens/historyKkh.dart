@@ -8,6 +8,7 @@ class HistoryKkhScreen extends StatelessWidget {
   final String jamBangunTidur;
   final String jamBerangkat;
   final String keluhan;
+  final String role;
 
   const HistoryKkhScreen({
     super.key,
@@ -18,6 +19,7 @@ class HistoryKkhScreen extends StatelessWidget {
     required this.jamBangunTidur,
     required this.jamBerangkat,
     required this.keluhan,
+    required this.role,
   });
 
   @override
@@ -68,6 +70,7 @@ class HistoryKkhScreen extends StatelessWidget {
                 jamBangunTidur: jamBangunTidur,
                 jamBerangkat: jamBerangkat,
                 keluhan: keluhan,
+                role: role,
               ),
               // Add more _buildHistoryCard widgets here as needed
             ],
@@ -86,6 +89,7 @@ class HistoryKkhScreen extends StatelessWidget {
         required String jamBangunTidur,
         required String jamBerangkat,
         required String keluhan,
+        required String role,
       }) {
     final totalTidur = _calculateTotalTidur(jamTidur, jamBangunTidur);
 
@@ -111,6 +115,29 @@ class HistoryKkhScreen extends StatelessWidget {
             _buildDetailRow('Jam Berangkat:', jamBerangkat),
             const SizedBox(height: 8),
             _buildDetailRow('Keluhan Fisik / Mental:', keluhan),
+            if (role == 'foreman') // Add button if the role is foreman
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton(
+                      onPressed: (){
+                        // function submit
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF304FFE),
+                        textStyle: const TextStyle(
+                          fontSize: 18,
+                        ),
+                        foregroundColor: Colors.white,
+                        elevation: 5,
+                      ),
+                      child: const Text('Validation'),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

@@ -8,7 +8,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // Simulasi data pengguna
   String username = 'John Doe';
   String email = 'johndoe@example.com';
   String phoneNumber = '+1234567890';
@@ -23,15 +22,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 5,
         shadowColor: Colors.black,
         titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w400
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w400
         ),
         toolbarHeight: 45,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new), 
+          icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
-          onPressed: () { 
+          onPressed: () {
             Navigator.pop(context);
           },
         ),
@@ -51,7 +50,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             icon: const Icon(Icons.edit),
             color: Colors.white,
             onPressed: () {
-              // Navigasi ke halaman edit ketika tombol "Edit" ditekan
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -62,7 +60,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ).then((editedData) {
-                // Callback untuk mengupdate data setelah selesai editing
                 if (editedData != null) {
                   setState(() {
                     username = editedData['username'];
@@ -103,10 +100,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
-
-  void _navigateBack(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/settings');
   }
 }
 
@@ -165,15 +158,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         elevation: 5,
         shadowColor: Colors.black,
         titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w400
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w400
         ),
         toolbarHeight: 45,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new), 
+          icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
-          onPressed: () { 
+          onPressed: () {
             Navigator.pop(context);
           },
         ),
@@ -231,8 +224,5 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
-  }
-  void _navigateBackProfile(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/profile');
   }
 }
