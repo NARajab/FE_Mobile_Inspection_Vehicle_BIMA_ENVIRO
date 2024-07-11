@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/history/screens/template/bulldozer_template.dart';
-import 'package:myapp/features/history/screens/template/bus_template.dart';
-import 'package:myapp/features/history/screens/template/dump_truck_template.dart';
-import 'package:myapp/features/history/screens/template/excavator_template.dart';
-import 'package:myapp/features/history/screens/template/light_vehicle_template.dart';
+import '../../../history/screens/template/bulldozer_template.dart';
+import '../../../history/screens/template/bus_template.dart';
+import '../../../history/screens/template/dump_truck_template.dart';
+import '../../../history/screens/template/excavator_template.dart';
+import '../../../history/screens/template/light_vehicle_template.dart';
 
-class HistoryP2hScreen extends StatelessWidget {
+class Foremanvalidationp2hScreen extends StatelessWidget{
   final String idVehicle;
   final String date;
   final String role;
 
-  const HistoryP2hScreen({super.key, required this.idVehicle, required this.date, required this.role});
+  const Foremanvalidationp2hScreen({
+    super.key,
+    required this.idVehicle,
+    required this.date,
+    required this.role
+  });
 
-  Widget _buildTemplate(String idVehicle, String date, String entry) {
+  Widget _buildTemplate(String idVehicle, String date, String entry, String role){
     switch (idVehicle) {
       case 'Bulldozer':
         return BulldozerTemplate(date: date, entry: entry, role: role);
@@ -29,24 +34,25 @@ class HistoryP2hScreen extends StatelessWidget {
     }
   }
 
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History P2H'),
-        backgroundColor: const Color(0xFF304FFE),
+        title: const Text('Validation form P2H'),
+        backgroundColor:  const Color(0xFF304FFE),
         elevation: 5,
         shadowColor: Colors.black,
         titleTextStyle: const TextStyle(
-          color: Colors.white,
           fontSize: 20,
+          color: Colors.white,
           fontWeight: FontWeight.w400
         ),
         toolbarHeight: 45,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new), 
+          icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
-          onPressed: () { 
+          onPressed: (){
             Navigator.pop(context);
           },
         ),
@@ -58,22 +64,20 @@ class HistoryP2hScreen extends StatelessWidget {
               width: 69,
               height: 3,
               color: Colors.white,
-            ),
+            )
           ),
         ),
       ),
       body: ListView.builder(
-        itemCount: 1, // Just one entry based on your example
-        itemBuilder: (context, index) {
+        itemCount: 1,
+        itemBuilder: (context, index){
           final entry = {
             'idVehicle': idVehicle,
             'date': date,
-            'entry': 'Example entry description',
-            'role': role
+            'entry': 'Example entry description'
           };
-
-          return _buildTemplate(idVehicle, date, entry['entry']!);
-        },
+          return _buildTemplate(idVehicle, date, entry['entry']!, 'foreman');
+        }
       ),
     );
   }

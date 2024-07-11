@@ -4,9 +4,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:myapp/features/Setting/screens/setting.dart';
 import 'package:myapp/features/history/screens/history.dart';
+import 'package:myapp/features/home/screens/forman/foremankkh.dart';
+import 'package:myapp/features/home/screens/forman/foremanp2h.dart';
 import 'package:myapp/features/home/screens/kkh.dart';
 import 'package:myapp/features/home/screens/p2h/pph.dart';
 import 'package:intl/intl.dart';
+
+import 'forman/foremanValidationP2h.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -188,7 +192,7 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -197,7 +201,7 @@ class _HomePageContentState extends State<HomePageContent> {
               ],
             ),
           ),
-          const SizedBox(height: 0),
+          const SizedBox(height: 8.0),
         ],
       ),
     );
@@ -227,38 +231,52 @@ class _HomePageContentState extends State<HomePageContent> {
 
   Widget _buildWidgetOptions(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildOptionCard(context, 'P2H', Icons.settings),
-          _buildOptionCard(context, 'KKH', Icons.work),
+          _buildOptionCard(context, 'P2H', Icons.settings, 'foreman'),
+          _buildOptionCard(context, 'KKH', Icons.work, 'foreman'),
         ],
       ),
     );
   }
 
-  Widget _buildOptionCard(BuildContext context, String title, IconData icon) {
+  Widget _buildOptionCard(BuildContext context, String title, IconData icon, String role) {
     return GestureDetector(
       onTap: () {
         if (title == 'P2H') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => p2hScreen()),
-          );
+          if (role == 'driver') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => p2hScreen()),
+            );
+          } else if (role == 'foreman') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ForemanP2h()),
+            );
+          }
         } else if (title == 'KKH') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const KkhScreen()),
-          );
+          if (role == 'driver') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const KkhScreen()),
+            );
+          } else if (role == 'foreman') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ForemanKkh()),
+            );
+          }
         }
       },
       child: Card(
         elevation: 4,
         shadowColor: Colors.grey.withOpacity(0.5),
         child: Container(
-          width: 150,
-          height: 150,
+          width: 170,
+          height: 170,
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -300,7 +318,7 @@ class _HomePageContentState extends State<HomePageContent> {
   Widget _buildSubmissionItem(String title, String subtitle, IconData icon, Color iconColor) {
     return Card(
       elevation: 4,
-      shadowColor: Colors.grey.withOpacity(0.5),
+      shadowColor: Colors.grey.withOpacity(0.7),
       child: ListTile(
         leading: Icon(icon, size: 35, color: iconColor),
         title: Text(title),

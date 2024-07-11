@@ -3,6 +3,7 @@ import 'package:myapp/features/Setting/screens/change_password.dart';
 import 'package:myapp/features/Setting/screens/profile.dart';
 import 'package:myapp/features/authentication/screens/forgot_password.dart';
 import 'package:myapp/features/history/screens/history.dart';
+import 'package:myapp/features/home/screens/forman/foremanValidationP2h.dart';
 import 'package:myapp/features/home/screens/kkh.dart';
 import 'package:myapp/features/home/screens/p2h/excavator/postscript.dart';
 import 'package:myapp/features/home/screens/p2h/excavator/pphEx.dart';
@@ -100,7 +101,7 @@ class _MyAppState extends State<MyApp> {
         '/bsForm' : (context) => const p2hBsScreen(),
         '/exForm' : (context) => const p2hExScreen(),
         '/timesheet' : (context) => const TimesheetScreen(),
-        '/postscript' : (context) => PostscriptScreen()
+        '/postscript' : (context) => PostscriptScreen(),
       },
     );
   }

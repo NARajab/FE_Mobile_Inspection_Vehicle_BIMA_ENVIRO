@@ -190,10 +190,10 @@ class SafetyPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset(imagePath, height: 300),
+              Image.asset(imagePath, height: 400),
               const SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 30, ),
+                padding: const EdgeInsets.symmetric(vertical: 100 ),
                 child: Text(
                   title,
                   textAlign: TextAlign.center,
@@ -296,11 +296,11 @@ class SignInPage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('assets/images/Ellipse.png', height: 250),
+              Image.asset('assets/images/Ellipse.png', height: 350),
               const SizedBox(height: 20),
               const Text(
                 'Create Your',
@@ -318,7 +318,7 @@ class SignInPage extends StatelessWidget {
                 style: TextStyle(fontSize: 14),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 100),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: ElevatedButton(

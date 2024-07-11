@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class BulldozerTemplate extends StatelessWidget {
   final String date;
   final String entry;
+  final String role;
 
   const BulldozerTemplate({
     super.key,
     required this.date,
     required this.entry,
+    required this.role
   });
 
   @override
@@ -47,9 +49,45 @@ class BulldozerTemplate extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                
                 const SizedBox(height: 12),
                 _buildTable(),
+                if (role == 'foreman') ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Catatan/Temuan:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Tambahkan catatan...',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ElevatedButton(
+                          onPressed: (){
+                            // function submit
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF304FFE),
+                            textStyle: const TextStyle(
+                              fontSize: 18,
+                            ),
+                            foregroundColor: Colors.white,
+                            elevation: 5,
+                          ),
+                          child: const Text('Submit'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

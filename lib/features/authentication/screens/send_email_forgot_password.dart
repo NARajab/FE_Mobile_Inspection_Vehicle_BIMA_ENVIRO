@@ -14,6 +14,7 @@ class _SendEmailForgotPasswordScreenState extends State<SendEmailForgotPasswordS
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
             toolbarHeight: 40,
@@ -63,19 +64,19 @@ class _SendEmailForgotPasswordScreenState extends State<SendEmailForgotPasswordS
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 25.0),
+                const SizedBox(height: 55.0),
                 Center(
                   child: Image.asset(
                     'assets/images/sefp.png',
-                    height: 250.0,
+                    height: 300.0,
                   ),
                 ),
-                const SizedBox(height: 30.0),
+                const SizedBox(height: 60.0),
                 Card(
                   color: const Color.fromARGB(0, 255, 255, 255),
                   elevation: 0,
                   child: Padding(
-                    padding: const EdgeInsets.all(0.0),
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
