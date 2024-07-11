@@ -4,9 +4,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:myapp/features/Setting/screens/setting.dart';
 import 'package:myapp/features/history/screens/history.dart';
+import 'package:myapp/features/home/screens/forman/foremankkh.dart';
+import 'package:myapp/features/home/screens/forman/foremanp2h.dart';
 import 'package:myapp/features/home/screens/kkh.dart';
 import 'package:myapp/features/home/screens/p2h/pph.dart';
 import 'package:intl/intl.dart';
+
+import 'forman/foremanValidationP2h.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -231,26 +235,40 @@ class _HomePageContentState extends State<HomePageContent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildOptionCard(context, 'P2H', Icons.settings),
-          _buildOptionCard(context, 'KKH', Icons.work),
+          _buildOptionCard(context, 'P2H', Icons.settings, 'foreman'),
+          _buildOptionCard(context, 'KKH', Icons.work, 'foreman'),
         ],
       ),
     );
   }
 
-  Widget _buildOptionCard(BuildContext context, String title, IconData icon) {
+  Widget _buildOptionCard(BuildContext context, String title, IconData icon, String role) {
     return GestureDetector(
       onTap: () {
         if (title == 'P2H') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => p2hScreen()),
-          );
+          if (role == 'driver') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => p2hScreen()),
+            );
+          } else if (role == 'foreman') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ForemanP2h()),
+            );
+          }
         } else if (title == 'KKH') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const KkhScreen()),
-          );
+          if (role == 'driver') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const KkhScreen()),
+            );
+          } else if (role == 'foreman') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ForemanKkh()),
+            );
+          }
         }
       },
       child: Card(
