@@ -206,6 +206,7 @@ class _HomePageContentState extends State<HomePageContent> {
   }
 
   Widget _buildCounter(String title, String count) {
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -314,14 +315,18 @@ class _HomePageContentState extends State<HomePageContent> {
   }
 
   Widget _buildSubmissionItem(String title, String subtitle, IconData icon, Color iconColor) {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.grey.withOpacity(0.7),
-      child: ListTile(
-        leading: Icon(icon, size: 35, color: iconColor),
-        title: Text(title),
-        subtitle: Text(subtitle),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Card(
+        elevation: 4,
+        shadowColor: Colors.grey.withOpacity(0.7),
+        child: ListTile(
+          leading: Icon(icon, size: 35, color: iconColor),
+          title: Text(title),
+          subtitle: Text(subtitle),
+        ),
       ),
     );
   }
+
 }

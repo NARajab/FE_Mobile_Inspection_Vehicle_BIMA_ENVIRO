@@ -113,6 +113,17 @@ class _ForemanKkhState extends State<ForemanKkh> {
             }
           },
         ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(6),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              width: 69,
+              height: 3,
+              color: Colors.white,
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
