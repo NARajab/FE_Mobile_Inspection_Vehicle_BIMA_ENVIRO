@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/authentication/screens/register.dart';
 import 'package:myapp/features/authentication/screens/send_email_forgot_password.dart';
 
 import '../../home/screens/homepage.dart';
@@ -139,10 +140,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const SendEmailForgotPasswordScreen(),
-                                  )
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SendEmailForgotPasswordScreen(),
+                                    )
                                 );
                               },
                               child: const Text(
@@ -166,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                              padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 15),
                               backgroundColor: const Color(0xFF304FFE),
                               textStyle: const TextStyle(
                                 fontSize: 18,
@@ -183,6 +184,38 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const RegisterScreen(), // Ganti dengan halaman registrasi yang sesuai
+                        ),
+                      );
+                    },
+                    child: RichText(
+                      text: const TextSpan(
+                        text: "Don’t have an account ? ",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: "Sign Up",
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
               ],
             ),
           ),
