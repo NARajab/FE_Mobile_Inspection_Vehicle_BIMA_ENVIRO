@@ -9,8 +9,15 @@ class HistoryP2hScreen extends StatelessWidget {
   final String idVehicle;
   final String date;
   final String role;
+  final bool isValidated;
 
-  const HistoryP2hScreen({super.key, required this.idVehicle, required this.date, required this.role});
+  const HistoryP2hScreen({
+    super.key,
+    required this.idVehicle,
+    required this.date,
+    required this.role,
+    required this.isValidated
+  });
 
   Widget _buildTemplate(String idVehicle, String date, String entry) {
     switch (idVehicle) {

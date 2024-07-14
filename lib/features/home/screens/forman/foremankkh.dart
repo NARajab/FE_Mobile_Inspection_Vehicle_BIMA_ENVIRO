@@ -19,9 +19,9 @@ class _ForemanKkhState extends State<ForemanKkh> {
       'date': '2024-07-06',
       'role': 'foreman',
       'day': 'Monday',
-      'jamTidur': '22:00',
-      'jamBangunTidur': '06:00',
+      'totalJamTidur': '7h 5m',
       'subtitle': 'Fit to work',
+      'isValidated': 'true',
       'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1719707258551._H7RYLl8f_.jpg?updatedAt=1719707261329'
     },
     {
@@ -29,9 +29,9 @@ class _ForemanKkhState extends State<ForemanKkh> {
       'date': '2024-07-05',
       'role': 'foreman',
       'day': 'Tuesday',
-      'jamTidur': '21:00',
-      'jamBangunTidur': '05:00',
+      'totalJamTidur': '7h 5m',
       'subtitle': 'Headache',
+      'isValidated': 'false',
       'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1717269588897._L1v_b3Xxs.jpeg?updatedAt=1717269592622'
     },
     {
@@ -39,9 +39,9 @@ class _ForemanKkhState extends State<ForemanKkh> {
       'date': '2024-07-05',
       'role': 'foreman',
       'day': 'Tuesday',
-      'jamTidur': '22:30',
-      'jamBangunTidur': '06:30',
+      'totalJamTidur': '7h 5m',
       'subtitle': 'Tiredness',
+      'isValidated': 'true',
       'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1716628280492._vYkSwuJFd.png?updatedAt=1716628284144'
     },
     {
@@ -49,9 +49,9 @@ class _ForemanKkhState extends State<ForemanKkh> {
       'date': '2024-07-05',
       'role': 'foreman',
       'day': 'Tuesday',
-      'jamTidur': '21:45',
-      'jamBangunTidur': '05:45',
+      'totalJamTidur': '7h 5m',
       'subtitle': 'Fit to work',
+      'isValidated': 'false',
       'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1716042874421._bFugJUAE6f.png?updatedAt=1716042887192'
     },
   ];
@@ -72,6 +72,9 @@ class _ForemanKkhState extends State<ForemanKkh> {
 
   @override
   Widget build(BuildContext context) {
+    // Sort data so that items with isValidated == 'false' appear first
+    data.sort((a, b) => a['isValidated']!.compareTo(b['isValidated']!));
+
     return Scaffold(
       appBar: AppBar(
         title: isSearching
@@ -159,10 +162,10 @@ class _ForemanKkhState extends State<ForemanKkh> {
             builder: (context) => HistoryKkhScreen(
               day: item['day']!,
               date: item['date']!,
-              jamTidur: item['jamTidur']!,
-              jamBangunTidur: item['jamBangunTidur']!,
+              totalJamTidur: item['totalJamTidur']!,
               role: item['role']!,
               imageUrl: item['imageUrl']!,
+              isValidated: item['isValidated'] == 'true',
             ),
           ),
         );
@@ -170,7 +173,30 @@ class _ForemanKkhState extends State<ForemanKkh> {
       child: Card(
         elevation: 3,
         child: ListTile(
-          title: Text(item['title']!),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(item['title']!),
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: item['isValidated'] == 'true' ? Colors.green : Colors.red,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: item['isValidated'] == 'true'
+                          ? Colors.green.withOpacity(0.5)
+                          : Colors.red.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 3,
+                      offset: const Offset(0, 1), // changes position of shadow
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           subtitle: Text(item['subtitle']!),
         ),
       ),
