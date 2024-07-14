@@ -6,19 +6,19 @@ import 'package:photo_view/photo_view.dart';
 class HistoryKkhScreen extends StatelessWidget {
   final String day;
   final String date;
-  final String jamTidur;
-  final String jamBangunTidur;
+  final String totalJamTidur;
   final String role;
   final String imageUrl;
+  final bool isValidated;
 
   const HistoryKkhScreen({
     super.key,
     required this.day,
     required this.date,
-    required this.jamTidur,
-    required this.jamBangunTidur,
+    required this.totalJamTidur,
     required this.role,
     required this.imageUrl,
+    required this.isValidated,
   });
 
   @override
@@ -64,10 +64,10 @@ class HistoryKkhScreen extends StatelessWidget {
                 context,
                 day: day,
                 date: date,
-                jamTidur: jamTidur,
-                jamBangunTidur: jamBangunTidur,
+                totalJamTidur: totalJamTidur,
                 role: role,
                 imageUrl: imageUrl,
+                isValidated: isValidated,
               ),
               // Add more _buildHistoryCard widgets here as needed
             ],
@@ -81,12 +81,11 @@ class HistoryKkhScreen extends StatelessWidget {
       BuildContext context, {
         required String day,
         required String date,
-        required String jamTidur,
-        required String jamBangunTidur,
+        required String totalJamTidur,
         required String role,
         required String imageUrl,
+        required bool isValidated,
       }) {
-    final totalTidur = _calculateTotalTidur(jamTidur, jamBangunTidur);
 
     return Card(
       elevation: 2,
@@ -96,14 +95,24 @@ class HistoryKkhScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '$day, $date',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isValidated ? 'Validated' : 'Not Yet Validated',
+                  style: TextStyle(
+                    color: isValidated ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '$day, $date',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
-            _buildDetailRow('Jam Tidur:', jamTidur),
-            _buildDetailRow('Jam Bangun Tidur:', jamBangunTidur),
-            _buildDetailRow('Total Tidur:', totalTidur),
+            _buildDetailRow('Total Jam Tidur:', totalJamTidur),
             const SizedBox(height: 8),
             if (imageUrl.isNotEmpty)
               GestureDetector(
@@ -211,34 +220,6 @@ class HistoryKkhScreen extends StatelessWidget {
       }),
     );
     return completer.future;
-  }
-
-
-
-  String _calculateTotalTidur(String jamTidur, String jamBangunTidur) {
-    final format = RegExp(r'(\d{2}):(\d{2})');
-
-    final tidurMatch = format.firstMatch(jamTidur);
-    final bangunMatch = format.firstMatch(jamBangunTidur);
-
-    if (tidurMatch == null || bangunMatch == null) {
-      return 'Invalid time format';
-    }
-
-    final tidurHour = int.parse(tidurMatch.group(1)!);
-    final tidurMinute = int.parse(tidurMatch.group(2)!);
-
-    final bangunHour = int.parse(bangunMatch.group(1)!);
-    final bangunMinute = int.parse(bangunMatch.group(2)!);
-
-    final tidur = DateTime(2024, 1, 1, tidurHour, tidurMinute);
-    final bangun = DateTime(2024, 1, 2, bangunHour, bangunMinute);
-
-    final duration = bangun.difference(tidur);
-    final hours = duration.inHours;
-    final minutes = duration.inMinutes % 60;
-
-    return '${hours}h ${minutes}m';
   }
 
   Widget _buildDetailRow(String label, String value) {

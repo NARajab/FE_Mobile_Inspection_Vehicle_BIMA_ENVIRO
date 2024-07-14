@@ -4,12 +4,14 @@ class BulldozerTemplate extends StatelessWidget {
   final String date;
   final String entry;
   final String role;
+  final bool isValidated;
 
   const BulldozerTemplate({
     super.key,
     required this.date,
     required this.entry,
-    required this.role
+    required this.role,
+    this.isValidated = false,
   });
 
   @override

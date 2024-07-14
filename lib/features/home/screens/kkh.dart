@@ -83,7 +83,7 @@ class _KkhScreenState extends State<KkhScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Masukkan jam tidur dan bangun tidur anda',
+              'Masukkan jumlah jam tidur anda',
               style: TextStyle(
                   fontSize: 16
               ),
@@ -92,19 +92,11 @@ class _KkhScreenState extends State<KkhScreen> {
             TextField(
               controller: jamTidurController,
               decoration: const InputDecoration(
-                labelText: 'Jam Tidur',
+                labelText: 'Jumlah Jam Tidur',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 15),
-            TextField(
-              controller: jamBangunTidurController,
-              decoration: const InputDecoration(
-                labelText: 'Jam Bangun Tidur',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: pickImage,
               child: const Text('Pilih Gambar'),
@@ -112,9 +104,9 @@ class _KkhScreenState extends State<KkhScreen> {
             const SizedBox(height: 10),
             _image == null
                 ? const Text('Tidak ada gambar yang dipilih.')
-                : Container(
-              width: 200, // Set the desired width
-              height: 200, // Set the desired height
+                : SizedBox(
+              width: 200,
+              height: 200,
               child: Image.file(
                 _image!,
                 fit: BoxFit.cover, // Ensures the image covers the container
