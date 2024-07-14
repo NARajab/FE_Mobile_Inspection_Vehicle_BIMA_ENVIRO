@@ -19,44 +19,40 @@ class _ForemanKkhState extends State<ForemanKkh> {
       'date': '2024-07-06',
       'role': 'foreman',
       'day': 'Monday',
-      'jamPulangKerja': '18:00',
       'jamTidur': '22:00',
       'jamBangunTidur': '06:00',
-      'jamBerangkat': '07:00',
       'subtitle': 'Fit to work',
+      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1719707258551._H7RYLl8f_.jpg?updatedAt=1719707261329'
     },
     {
       'name': 'Kurniawan',
       'date': '2024-07-05',
       'role': 'foreman',
       'day': 'Tuesday',
-      'jamPulangKerja': '17:00',
       'jamTidur': '21:00',
       'jamBangunTidur': '05:00',
-      'jamBerangkat': '06:00',
       'subtitle': 'Headache',
+      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1717269588897._L1v_b3Xxs.jpeg?updatedAt=1717269592622'
     },
     {
       'name': 'Kusep',
       'date': '2024-07-05',
       'role': 'foreman',
       'day': 'Tuesday',
-      'jamPulangKerja': '17:30',
       'jamTidur': '22:30',
       'jamBangunTidur': '06:30',
-      'jamBerangkat': '07:30',
       'subtitle': 'Tiredness',
+      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1716628280492._vYkSwuJFd.png?updatedAt=1716628284144'
     },
     {
       'name': 'Hermawan',
       'date': '2024-07-05',
       'role': 'foreman',
       'day': 'Tuesday',
-      'jamPulangKerja': '17:45',
       'jamTidur': '21:45',
       'jamBangunTidur': '05:45',
-      'jamBerangkat': '06:45',
       'subtitle': 'Fit to work',
+      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1716042874421._bFugJUAE6f.png?updatedAt=1716042887192'
     },
   ];
 
@@ -163,12 +159,10 @@ class _ForemanKkhState extends State<ForemanKkh> {
             builder: (context) => HistoryKkhScreen(
               day: item['day']!,
               date: item['date']!,
-              jamPulangKerja: item['jamPulangKerja']!,
               jamTidur: item['jamTidur']!,
               jamBangunTidur: item['jamBangunTidur']!,
-              jamBerangkat: item['jamBerangkat']!,
-              keluhan: item['subtitle']!,
               role: item['role']!,
+              imageUrl: item['imageUrl']!,
             ),
           ),
         );
