@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class KkhScreen extends StatefulWidget {
   const KkhScreen({super.key});
@@ -8,41 +10,38 @@ class KkhScreen extends StatefulWidget {
 }
 
 class _KkhScreenState extends State<KkhScreen> {
-  // Controllers for input fields
-  final TextEditingController jamPulangKerjaController =
-      TextEditingController();
   final TextEditingController jamTidurController = TextEditingController();
-  final TextEditingController jamBangunTidurController =
-      TextEditingController();
-  final TextEditingController jamBerangkatKerjaController =
-      TextEditingController();
-  final TextEditingController keluhanFisikMentalController =
-      TextEditingController();
+  final TextEditingController jamBangunTidurController = TextEditingController();
+  File? _image;
 
-  // Function to clear all input fields
+  final ImagePicker _picker = ImagePicker();
+
   void clearFields() {
-    jamPulangKerjaController.clear();
     jamTidurController.clear();
     jamBangunTidurController.clear();
-    jamBerangkatKerjaController.clear();
-    keluhanFisikMentalController.clear();
+    setState(() {
+      _image = null;
+    });
   }
 
-  // Function to submit data
+  Future<void> pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      }
+    });
+  }
+
   void submitData() {
-    // final String jamPulangKerja = jamPulangKerjaController.text;
     // final String jamTidur = jamTidurController.text;
     // final String jamBangunTidur = jamBangunTidurController.text;
-    // final String jamBerangkatKerja = jamBerangkatKerjaController.text;
-    // final String keluhanFisikMental = keluhanFisikMentalController.text;
 
     // Here you can add the logic to save the data
     // For example, you can send it to a backend or save it locally
 
-    // Clear the input fields after submission
     clearFields();
 
-    // Show a snackbar or dialog to indicate success
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Data submitted successfully')),
     );
@@ -52,7 +51,7 @@ class _KkhScreenState extends State<KkhScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('KKH'),
+        title: const Text('Form KKH'),
         backgroundColor: const Color(0xFF304FFE),
         elevation: 5,
         shadowColor: Colors.black,
@@ -83,14 +82,13 @@ class _KkhScreenState extends State<KkhScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              controller: jamPulangKerjaController,
-              decoration: const InputDecoration(
-                labelText: 'Jam Pulang Kerja',
-                border: OutlineInputBorder(),
+            const Text(
+              'Masukkan jam tidur dan bangun tidur anda',
+              style: TextStyle(
+                  fontSize: 16
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 10,),
             TextField(
               controller: jamTidurController,
               decoration: const InputDecoration(
@@ -98,7 +96,7 @@ class _KkhScreenState extends State<KkhScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             TextField(
               controller: jamBangunTidurController,
               decoration: const InputDecoration(
@@ -107,22 +105,22 @@ class _KkhScreenState extends State<KkhScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            TextField(
-              controller: jamBerangkatKerjaController,
-              decoration: const InputDecoration(
-                labelText: 'Jam Berangkat Kerja',
-                border: OutlineInputBorder(),
+            ElevatedButton(
+              onPressed: pickImage,
+              child: const Text('Pilih Gambar'),
+            ),
+            const SizedBox(height: 10),
+            _image == null
+                ? const Text('Tidak ada gambar yang dipilih.')
+                : Container(
+              width: 200, // Set the desired width
+              height: 200, // Set the desired height
+              child: Image.file(
+                _image!,
+                fit: BoxFit.cover, // Ensures the image covers the container
               ),
             ),
             const SizedBox(height: 10),
-            TextField(
-              controller: keluhanFisikMentalController,
-              decoration: const InputDecoration(
-                labelText: 'Keluhan Fisik / Mental',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: submitData,
               style: ElevatedButton.styleFrom(

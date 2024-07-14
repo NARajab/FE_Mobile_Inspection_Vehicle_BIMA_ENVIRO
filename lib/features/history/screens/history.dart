@@ -172,12 +172,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     context,
                     day: historyItem['day']!,
                     date: historyItem['date']!,
-                    jamPulangKerja: '18:00',
                     jamTidur: '22:00',
                     jamBangunTidur: '06:00',
-                    jamBerangkat: '08:00',
-                    keluhan: historyItem['subtitle']!,
-                    role: 'driver'
+                    role: 'driver',
+                    imageUrl: 'https://ik.imagekit.io/AliRajab03/IMG-1720826221625._Igyktated.jpg?updatedAt=1720826233501'
                 );
               },
               child: Card(
@@ -211,11 +209,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
       BuildContext context, {
         required String day,
         required String date,
-        required String jamPulangKerja,
         required String jamTidur,
         required String jamBangunTidur,
-        required String jamBerangkat,
-        required String keluhan,
+        required String imageUrl,
         required String role
       }) {
     Navigator.push(
@@ -224,12 +220,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
         builder: (context) => HistoryKkhScreen(
           day: day,
           date: date,
-          jamPulangKerja: jamPulangKerja,
           jamTidur: jamTidur,
           jamBangunTidur: jamBangunTidur,
-          jamBerangkat: jamBerangkat,
-          keluhan: keluhan,
-          role: role
+          role: role,
+          imageUrl: imageUrl,
         ),
       ),
     );
