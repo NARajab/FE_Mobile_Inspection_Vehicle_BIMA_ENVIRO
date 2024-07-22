@@ -165,7 +165,7 @@ class _ForemanKkhState extends State<ForemanKkh> {
               totalJamTidur: item['totalJamTidur']!,
               role: item['role']!,
               imageUrl: item['imageUrl']!,
-              isValidated: item['isValidated'] == 'true',
+              isValidated: item['isValidated'] == 'true', subtitle: '',
             ),
           ),
         );

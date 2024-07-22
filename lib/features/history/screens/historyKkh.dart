@@ -6,6 +6,7 @@ import 'package:photo_view/photo_view.dart';
 class HistoryKkhScreen extends StatelessWidget {
   final String day;
   final String date;
+  final String subtitle;
   final String totalJamTidur;
   final String role;
   final String imageUrl;
@@ -19,6 +20,7 @@ class HistoryKkhScreen extends StatelessWidget {
     required this.role,
     required this.imageUrl,
     required this.isValidated,
+    required this.subtitle,
   });
 
   @override
