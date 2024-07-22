@@ -146,12 +146,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             children: filteredData.map((item) => GestureDetector(
               onTap: () {
+                print('Navigating to HistoryP2hScreen with: ${item['date']}, ${item['subtitle']}, ${item['isValidated']}');
                 navigateToHistoryP2h(
-                  context,
-                  item['subtitle']!,
-                  item['date']!,
-                  item['driver']!,
-                  (item['isValidated'] == 'true') as String,
+                    context,
+                    item['date']!.split(' - ')[1],
+                    item['date']!.split(' - ')[0],
+                    'driver', // Assume role is 'driver' for now
+                    item['isValidated']!
                 );
               },
               child: Card(
@@ -191,15 +192,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-
-
-
-
   Widget _buildKKHTab() {
     List<Map<String, String>> filteredData = kkhHistoryData.where((item) =>
     item['day']!.toLowerCase().contains(filterText) ||
         item['date']!.toLowerCase().contains(filterText) ||
-        (item['keluhan'] != null && item['keluhan']!.toLowerCase().contains(filterText))
+        (item['subtitle'] != null && item['subtitle']!.toLowerCase().contains(filterText))
     ).toList();
 
     // Sort data berdasarkan tanggal 'day'
@@ -236,20 +233,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
               onTap: () {
                 navigateToHistoryKkh(
                     context,
-                    day: historyItem['day']!,
-                    date: historyItem['date']!,
-                    totalJamTidur: historyItem['totalJamTidur']!,
-                    role: 'driver',
-                    imageUrl: historyItem['imageUrl']!,
-                    isValidated: historyItem['isValidated'] == 'true');
+                    historyItem['day']!,
+                    historyItem['date']!,
+                    historyItem['subtitle']!,
+                    historyItem['totalJamTidur']!,
+                    historyItem['imageUrl']!,
+                    historyItem['isValidated']!
+                );
               },
               child: Card(
                 elevation: 3,
                 child: ListTile(
-                  title: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(historyItem['imageUrl']!),
+                  ),
+                  title: Text('${historyItem['day']!}, ${historyItem['date']!}'),
+                  subtitle: Text(historyItem['subtitle']!),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(historyItem['date']!),
                       Container(
                         width: 10,
                         height: 10,
@@ -268,9 +270,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      Text(historyItem['totalJamTidur']!),
                     ],
                   ),
-                  subtitle: Text(historyItem['subtitle']!),
                 ),
               ),
             )).toList(),
@@ -280,45 +283,32 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-
-
-
-
-  void navigateToHistoryP2h(
-      BuildContext context,
-      String idVehicle,
-      String date,
-      String role,
-      String isValidated
-      ) {
+  void navigateToHistoryP2h(BuildContext context, String idVehicle, String date, String role, String isValidated) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            HistoryP2hScreen(idVehicle: idVehicle, date: date, role: role, isValidated: isValidated == 'true',),
+        builder: (context) => HistoryP2hScreen(
+          idVehicle: idVehicle,
+          date: date,
+          role: role,
+          isValidated: isValidated == 'true',
+        ),
       ),
     );
   }
 
-  void navigateToHistoryKkh(
-      BuildContext context, {
-        required String day,
-        required String date,
-        required String totalJamTidur,
-        required String imageUrl,
-        required String role,
-        required bool isValidated
-      }) {
+  void navigateToHistoryKkh(BuildContext context, String day, String date, String subtitle, String totalJamTidur, String imageUrl, String isValidated) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => HistoryKkhScreen(
           day: day,
           date: date,
+          subtitle: subtitle,
           totalJamTidur: totalJamTidur,
-          role: role,
           imageUrl: imageUrl,
-            isValidated: isValidated
+          isValidated: isValidated == 'true',
+          role: '',
         ),
       ),
     );
