@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-import '../../home/screens/homepage.dart';
+import 'package:myapp/features/authentication/services/auth_services.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'login_page.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -18,6 +17,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _phoneController = TextEditingController();
 
   bool _passwordVisible = false;
+  String _selectedRole = 'Driver';
+
+  final RegisterService _registerService = RegisterService();
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: <Widget>[
                   const SizedBox(height: 10.0),
                   const Text(
-                    "Lets Join With Me",
+                    "Lets Join With Us",
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
@@ -186,25 +188,69 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             keyboardType: TextInputType.phone,
                           ),
                           const SizedBox(height: 15.0),
+                          const Text(
+                            'Role',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 3.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: Radio<String>(
+                                    value: 'Driver',
+                                    groupValue: _selectedRole,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        _selectedRole = value!;
+                                      });
+                                    },
+                                  ),
+                                  title: const Text('Driver'),
+                                ),
+                              ),
+                              Expanded(
+                                child: ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: Radio<String>(
+                                    value: 'Forman',
+                                    groupValue: _selectedRole,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        _selectedRole = value!;
+                                      });
+                                    },
+                                  ),
+                                  title: const Text('Foreman'),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5.0),
                           Center(
                             child: Padding(
-                                padding: const EdgeInsets.only(top: 10),
-                                child: ElevatedButton(
-                                  onPressed: (){
-                                    //
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 15),
-                                    backgroundColor: const Color(0xFF304FFE),
-                                    textStyle: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    foregroundColor: Colors.white,
-                                    elevation: 5,
+                              padding: const EdgeInsets.only(top: 10),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _register();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 15),
+                                  backgroundColor: const Color(0xFF304FFE),
+                                  textStyle: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  child: const Text('Sign Up'),
+                                  foregroundColor: Colors.white,
+                                  elevation: 5,
                                 ),
+                                child: const Text('Sign Up'),
+                              ),
                             ),
                           ),
                         ],
@@ -218,5 +264,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  void _register() async {
+    final String username = _usernameController.text;
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+    final String phoneNumber = _phoneController.text;
+    final String role = _selectedRole;
+
+    try {
+      final response = await _registerService.register(username, email, password, phoneNumber, role);
+
+      if (response['status'] == 'success') {
+        Flushbar(
+          message: response['message'] ?? 'Register successful',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.green,
+          flushbarPosition: FlushbarPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+        ).show(context);
+        await Future.delayed(const Duration(seconds: 5));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      } else {
+        Flushbar(
+          message: response['message'] ?? 'Register failed',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.red,
+          flushbarPosition: FlushbarPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+        ).show(context);
+        throw Exception('Failed to register');
+      }
+    } catch (e) {
+      print('Exception: $e');
+      Flushbar(
+        message: 'Register failed',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+        flushbarPosition: FlushbarPosition.TOP,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+      ).show(context);
+    }
   }
 }
