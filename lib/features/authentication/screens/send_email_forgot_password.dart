@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/authentication/screens/forgot_password.dart';
+import 'package:myapp/features/authentication/services/auth_services.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class SendEmailForgotPasswordScreen extends StatefulWidget {
   const SendEmailForgotPasswordScreen({super.key});
@@ -10,6 +11,68 @@ class SendEmailForgotPasswordScreen extends StatefulWidget {
 
 class _SendEmailForgotPasswordScreenState extends State<SendEmailForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
+  final SendEmailService _sendEmailService = SendEmailService();
+
+
+  void _sendmail() async {
+    final String email = _emailController.text;
+
+    // if (email.isEmpty) {
+    //   Flushbar(
+    //     message: 'Please enter an email address',
+    //     duration: const Duration(seconds: 3),
+    //     backgroundColor: Colors.redAccent,
+    //     flushbarPosition: FlushbarPosition.TOP,
+    //     margin: const EdgeInsets.all(8),
+    //     borderRadius: BorderRadius.circular(8),
+    //   ).show(context);
+    //   return;
+    // }
+
+    try{
+      final response = await _sendEmailService.sendmail(email);
+
+      if (response['status'] == 'success') {
+        Flushbar(
+          message: response['message'] ?? 'Email successfully sent',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.green,
+          flushbarPosition: FlushbarPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+        ).show(context);
+      } else if (response['status'] == 'Error') {
+        Flushbar(
+          message: response['message'] ?? 'Error occurred',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.redAccent,
+          flushbarPosition: FlushbarPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+        ).show(context);
+      } else {
+        Flushbar(
+          message: response['message'] ?? 'Send email failed',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.redAccent,
+          flushbarPosition: FlushbarPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+        ).show(context);
+      }
+
+    }catch (e) {
+      print('Exception: $e');
+      Flushbar(
+        message: '$e',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.redAccent,
+        flushbarPosition: FlushbarPosition.TOP,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+      ).show(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,12 +169,7 @@ class _SendEmailForgotPasswordScreenState extends State<SendEmailForgotPasswordS
                         Center(
                           child: ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ForgotPassword(token: '',),
-                                ),
-                              );
+                              _sendmail();
                               // Add your send email functionality here
                               print('Send email to reset password for: ${_emailController.text}');
                             },

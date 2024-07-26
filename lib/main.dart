@@ -17,9 +17,7 @@ import 'features/authentication/screens/login_page.dart';
 import 'features/authentication/screens/send_email_forgot_password.dart';
 import 'features/home/screens/homepage.dart';
 import 'features/Setting/screens/setting.dart';
-import 'package:uni_links2/uni_links.dart';
 import 'dart:async';
-import 'dart:io';
 
 void main() async {
   runApp(const MyApp());
@@ -36,41 +34,9 @@ class _MyAppState extends State<MyApp> {
   StreamSubscription? _sub;
 
   @override
-  void initState() {
-    super.initState();
-    if (Platform.isAndroid || Platform.isIOS) {
-      _initDeepLinkListener();
-    }
-  }
-
-  @override
   void dispose() {
     _sub?.cancel();
     super.dispose();
-  }
-
-  void _initDeepLinkListener() {
-    _sub = linkStream.listen((String? link) {
-      if (link != null) {
-        _handleDeepLink(link);
-      }
-    }, onError: (err) {
-    });
-  }
-
-  void _handleDeepLink(String link) {
-    Uri uri = Uri.parse(link);
-    if (uri.path == '/reset-password') {
-      String? token = uri.queryParameters['token'];
-      if (token != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ForgotPassword(token: token),
-          ),
-        );
-      }
-    }
   }
 
   @override

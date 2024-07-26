@@ -14,7 +14,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String username = 'John Doe';
   String email = 'johndoe@example.com';
   String phoneNumber = '+1234567890';
-  String profileImageUrl = 'https://ik.imagekit.io/AliRajab03/person.png?updatedAt=1719966082276'; // Ganti dengan URL foto profil yang sesuai
+  String profileImageUrl = 'https://ik.imagekit.io/AliRajab03/person.png?updatedAt=1719966082276';
   File? profileImageFile;
 
   @override

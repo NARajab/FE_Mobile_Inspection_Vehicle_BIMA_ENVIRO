@@ -8,8 +8,11 @@ import 'package:myapp/features/home/screens/forman/foremankkh.dart';
 import 'package:myapp/features/home/screens/forman/foremanp2h.dart';
 import 'package:myapp/features/home/screens/kkh.dart';
 import 'package:myapp/features/home/screens/p2h/pph.dart';
+import 'package:myapp/features/home/services/p2h_services.dart';
+import 'package:myapp/features/home/services/kkh_services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,7 +28,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     const HomePageContent(),
     const HistoryScreen(),
     const SettingScreen(),
-    // Container()
   ];
 
   @override
@@ -99,19 +101,48 @@ class HomePageContent extends StatefulWidget {
 class _HomePageContentState extends State<HomePageContent> {
   int _currentPage = 0;
   String? _token;
+  String? _role;
+  Future<int>? _p2hCountFuture;
+  Future<int>? _kkhCountFuture;
 
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('id_ID');
     _loadToken();
+    _p2hCountFuture = _fetchP2hData();
+    _kkhCountFuture = _fetchKkhData();
   }
 
   Future<void> _loadToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _token = prefs.getString('token');
+      if (_token != null) {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(_token!);
+        _role = decodedToken['role'];
+      }
     });
+  }
+
+  Future<int> _fetchP2hData() async {
+    try {
+      P2hServices p2hServices = P2hServices();
+      return await p2hServices.getAllP2hLength();
+    } catch (e) {
+      print('Error fetching P2H data: $e');
+      return 0;
+    }
+  }
+
+  Future<int> _fetchKkhData() async {
+    try {
+      KkhServices kkhServices = KkhServices();
+      return await kkhServices.getAllKkhLength();
+    } catch (e) {
+      print('Error fetching KKH data: $e');
+      return 0;
+    }
   }
 
   @override
@@ -202,8 +233,34 @@ class _HomePageContentState extends State<HomePageContent> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildCounter('Total Submisi P2H Saat Ini', '100 KALI'),
-                _buildCounter('Total Submisi KKH Saat Ini', '100 KALI'),
+                FutureBuilder<int>(
+                  future: _p2hCountFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return _buildCounter('Total Submission P2H Saat Ini', 'Loading...');
+                    } else if (snapshot.hasError) {
+                      return _buildCounter('Total Submission P2H Saat Ini', 'Error');
+                    } else if (snapshot.hasData) {
+                      return _buildCounter('Total Submission P2H Saat Ini', '${snapshot.data} KALI');
+                    } else {
+                      return _buildCounter('Total Submission P2H Saat Ini', '0 KALI');
+                    }
+                  },
+                ),
+                FutureBuilder(
+                  future: _kkhCountFuture,
+                  builder: (context, snapshot){
+                    if(snapshot.connectionState == ConnectionState.waiting){
+                      return _buildCounter('Total Submission KKH Saat Ini', 'Loading...');
+                    } else if (snapshot.hasError) {
+                      return _buildCounter('Total Submission KKH Saat Ini', 'Error');
+                    } else if (snapshot.hasData) {
+                      return _buildCounter('Total Submission KKH Saat Ini', '${snapshot.data} KALI');
+                    } else {
+                      return _buildCounter('Total Submission KKH Saat Ini', '0 KALI');
+                    }
+                  }
+                ),
               ],
             ),
           ),
@@ -242,8 +299,8 @@ class _HomePageContentState extends State<HomePageContent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildOptionCard(context, 'P2H', Icons.settings, 'foreman'),
-          _buildOptionCard(context, 'KKH', Icons.work, 'foreman'),
+          _buildOptionCard(context, 'P2H', Icons.settings, '$_role'),
+          _buildOptionCard(context, 'KKH', Icons.work, '$_role'),
         ],
       ),
     );
@@ -253,24 +310,24 @@ class _HomePageContentState extends State<HomePageContent> {
     return GestureDetector(
       onTap: () {
         if (title == 'P2H') {
-          if (role == 'driver') {
+          if (role == 'Driver') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => p2hScreen()),
             );
-          } else if (role == 'foreman') {
+          } else if (role == 'Forman') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ForemanP2h()),
             );
           }
         } else if (title == 'KKH') {
-          if (role == 'driver') {
+          if (role == 'Driver') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const KkhScreen()),
             );
-          } else if (role == 'foreman') {
+          } else if (role == 'Forman') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ForemanKkh()),
