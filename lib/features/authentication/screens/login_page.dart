@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/authentication/screens/register.dart';
 import 'package:myapp/features/authentication/screens/send_email_forgot_password.dart';
+import 'package:myapp/features/authentication/services/auth_services.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../home/screens/homepage.dart';
 
@@ -16,6 +19,74 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _passwordVisible = false;
+  final AuthService _authService = AuthService();
+
+  Future<void> _login() async {
+    try {
+      final result = await _authService.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+
+      print("Login result: $result");
+
+      if (result['status'] == 'success') {
+        final token = result['token'];
+        if (token != null) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+
+          Flushbar(
+            message: result['message'] ?? 'Login successful',
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.green,
+            flushbarPosition: FlushbarPosition.TOP,
+            margin: const EdgeInsets.all(8),
+            borderRadius: BorderRadius.circular(8),
+          ).show(context);
+
+          await Future.delayed(const Duration(seconds: 3));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            ),
+          );
+        } else {
+          Flushbar(
+            message: 'Token is missing',
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+            flushbarPosition: FlushbarPosition.TOP,
+            margin: const EdgeInsets.all(8),
+            borderRadius: BorderRadius.circular(8),
+          ).show(context);
+        }
+      } else {
+        Flushbar(
+          message: result['message'] ?? 'Login failed',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.red,
+          flushbarPosition: FlushbarPosition.TOP,
+          margin: const EdgeInsets.all(8),
+          borderRadius: BorderRadius.circular(8),
+        ).show(context);
+      }
+    } catch (e) {
+      Flushbar(
+        message: 'Exception: $e',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+        flushbarPosition: FlushbarPosition.TOP,
+        margin: const EdgeInsets.all(8),
+        borderRadius: BorderRadius.circular(8),
+      ).show(context);
+    }
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +119,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: Colors.grey,
                   ),
                 ),
-                const SizedBox(height: 100.0),
+                const SizedBox(height: 20.0),
+                const SizedBox(height: 50.0),
                 Center( // Center the image
                   child: Image.asset(
                     'assets/images/admin.png',
@@ -76,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextField(
                           controller: _emailController,
                           decoration: const InputDecoration(
-                            hintText: 'guntur.email@mail.com',
+                            hintText: 'example@mail.com',
                             filled: true,
                             fillColor: Color(0xFFF3F4F8),
                             border: OutlineInputBorder(
@@ -118,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                           ),
-                          obscureText: !_passwordVisible, // Gunakan variabel _passwordVisible di sini
+                          obscureText: !_passwordVisible,
                         ),
                         const SizedBox(height: 5),
                         Row(
@@ -158,14 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 20),
                         Center(
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const HomePage(),
-                                ),
-                              );
-                            },
+                            onPressed: _login,
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 15),
                               backgroundColor: const Color(0xFF304FFE),

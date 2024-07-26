@@ -9,6 +9,7 @@ import 'package:myapp/features/home/screens/forman/foremanp2h.dart';
 import 'package:myapp/features/home/screens/kkh.dart';
 import 'package:myapp/features/home/screens/p2h/pph.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,7 +48,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               iconSize: 30,
               color: Colors.black,
               onPressed: () {
-                // Aksi ketika ikon notifikasi diklik
               },
             ),
           ],
@@ -98,12 +98,20 @@ class HomePageContent extends StatefulWidget {
 
 class _HomePageContentState extends State<HomePageContent> {
   int _currentPage = 0;
+  String? _token;
 
   @override
   void initState() {
     super.initState();
-    // Initialize date formatting for 'id_ID' locale
     initializeDateFormatting('id_ID');
+    _loadToken();
+  }
+
+  Future<void> _loadToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _token = prefs.getString('token');
+    });
   }
 
   @override

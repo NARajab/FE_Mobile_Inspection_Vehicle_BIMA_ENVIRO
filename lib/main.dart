@@ -17,12 +17,11 @@ import 'features/authentication/screens/login_page.dart';
 import 'features/authentication/screens/send_email_forgot_password.dart';
 import 'features/home/screens/homepage.dart';
 import 'features/Setting/screens/setting.dart';
-// ignore: depend_on_referenced_packages
 import 'package:uni_links2/uni_links.dart';
 import 'dart:async';
 import 'dart:io';
 
-void main() {
+void main() async {
   runApp(const MyApp());
 }
 
