@@ -3,14 +3,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class p2hBlScreen extends StatefulWidget {
-  const p2hBlScreen({super.key});
+  final int id;
+
+  const p2hBlScreen({super.key, required this.id});
 
   @override
   _p2hScreenState createState() => _p2hScreenState();
 }
 
 class _p2hScreenState extends State<p2hBlScreen> {
-  // Data untuk setiap card inspeksi
   List<List<Map<String, String>>> cardItems = [
     [
       {'item': 'Kondisi Underacarriage', 'kbj' : 'A'}, 
@@ -46,7 +47,6 @@ class _p2hScreenState extends State<p2hBlScreen> {
     ],
   ];
 
-  // Judul untuk setiap card inspeksi
   List<String> cardTitles = [
     'Pemeriksaan Keliling Unit',
     'Pemeriksaan di dalam kabin',
@@ -104,13 +104,11 @@ class _p2hScreenState extends State<p2hBlScreen> {
   }
 
   void submitData() async {
-    // Kumpulkan data checklist
     Map<String, bool> checklistData = {};
     itemChecklist.forEach((key, value) {
       checklistData[key] = value;
     });
 
-    // Kumpulkan data inputan wajib dan tambahan
     Map<String, String> inputData = {
       'modelu': modelUnitController.text.trim(),
       'nou': nomorUnitController.text.trim(),
@@ -123,13 +121,12 @@ class _p2hScreenState extends State<p2hBlScreen> {
       'notes': textEditingController.text.trim(),
     };
 
-    // Gabungkan semua data
     Map<String, dynamic> requestData = {
       ...checklistData,
       ...inputData,
+      'id': widget.id,
     };
 
-    // Kirim permintaan HTTP POST
     final response = await http.post(
       Uri.parse('https://your-backend-url.com/api/endpoint'),
       headers: {'Content-Type': 'application/json'},
@@ -137,14 +134,11 @@ class _p2hScreenState extends State<p2hBlScreen> {
     );
 
     if (response.statusCode == 200) {
-      // Berhasil
       print('Data submitted successfully');
     } else {
-      // Gagal
       print('Failed to submit data');
     }
 
-    // Reset input teks setelah submit
     textEditingController.clear();
     modelUnitController.clear();
     nomorUnitController.clear();

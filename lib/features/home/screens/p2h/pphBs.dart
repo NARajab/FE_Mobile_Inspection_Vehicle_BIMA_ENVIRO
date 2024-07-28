@@ -3,7 +3,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class p2hBsScreen extends StatefulWidget {
-  const p2hBsScreen({super.key});
+  final int id;
+
+  const p2hBsScreen({super.key, required this.id});
 
   @override
   _p2hScreenState createState() => _p2hScreenState();

@@ -1,10 +1,13 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class AuthService {
-  static const String apiUrl = 'https://672e-116-254-97-119.ngrok-free.app/api/v1/auth/login';
 
+class AuthService {
+  final String baseUrl = dotenv.env['API_URL']!;
   Future<Map<String, dynamic>> login(String username, String password) async {
+    const String endpoint = '/auth/login';
+    final String apiUrl = '$baseUrl$endpoint';
     final response = await http.post(
       Uri.parse(apiUrl),
       headers: <String, String>{
@@ -24,24 +27,22 @@ class AuthService {
       return data;
     }
   }
-}
 
-
-class RegisterService {
-  static const String apiUrl = 'https://672e-116-254-97-119.ngrok-free.app/api/v1/auth/register-member';
   Future<Map<String, dynamic>> register(String username, String email, String password, String phoneNumber, String role) async {
+    const String endpoint = '/auth/register-member';
+    final String apiUrl = '$baseUrl$endpoint';
     final response  = await http.post(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'username': username,
-        'email': email,
-        'password': password,
-        'phoneNumber': phoneNumber,
-        'role': role
-      })
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'username': username,
+          'email': email,
+          'password': password,
+          'phoneNumber': phoneNumber,
+          'role': role
+        })
     );
 
     if(response.statusCode == 201){
@@ -51,19 +52,18 @@ class RegisterService {
       throw Exception('Failed to register');
     }
   }
-}
 
-class SendEmailService {
-  static const String apiUrl = 'https://672e-116-254-97-119.ngrok-free.app/api/v1/auth/send-email';
   Future<Map<String, dynamic>> sendmail(String email) async {
+    const String endpoint = '/auth/send-email';
+    final String apiUrl = '$baseUrl$endpoint';
     final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-      body: jsonEncode(<String, String>{
-        'email': email
-      })
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: jsonEncode(<String, String>{
+          'email': email
+        })
     );
 
     final Map<String, dynamic> data = jsonDecode(response.body);
@@ -75,3 +75,4 @@ class SendEmailService {
     }
   }
 }
+

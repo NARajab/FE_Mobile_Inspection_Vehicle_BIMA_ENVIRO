@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:myapp/features/Setting/screens/change_password.dart';
 import 'package:myapp/features/Setting/screens/profile.dart';
 import 'package:myapp/features/authentication/screens/forgot_password.dart';
@@ -19,7 +20,8 @@ import 'features/home/screens/homepage.dart';
 import 'features/Setting/screens/setting.dart';
 import 'dart:async';
 
-void main() async {
+Future main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -47,10 +49,11 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
         fontFamily: 'Poppins',
       ),
+      initialRoute: '/',
       routes: {
         '/': (context) => const SafetyScreen(),
         '/login': (context) => const LoginScreen(),
-        '/forgot-password': (context) => const ForgotPassword(token: '',),
+        '/forgot-password': (context) => const ForgotPassword(token: ''),
         '/reset-password': (context) => const SendEmailForgotPasswordScreen(),
         '/home': (context) => const HomePage(),
         '/history': (context) => const HistoryScreen(),
@@ -58,14 +61,14 @@ class _MyAppState extends State<MyApp> {
         '/profile': (context) => const ProfileScreen(),
         '/change-password': (context) => const ChangePasswordScreen(),
         '/p2h': (context) => p2hScreen(),
-        '/kkh' : (context) => const KkhScreen(),
-        '/blForm' : (context) => const p2hBlScreen(),
-        '/dtForm' : (context) => const p2hDtScreen(),
-        '/lvFrom' : (context) => const p2hLvScreen(),
-        '/bsForm' : (context) => const p2hBsScreen(),
-        '/exForm' : (context) => const p2hExScreen(),
-        '/timesheet' : (context) => const TimesheetScreen(),
-        '/postscript' : (context) => PostscriptScreen(),
+        '/kkh': (context) => const KkhScreen(),
+        '/blForm': (context) => p2hBlScreen(id: ModalRoute.of(context)!.settings.arguments as int),
+        '/dtForm': (context) => p2hDtScreen(id: ModalRoute.of(context)!.settings.arguments as int),
+        '/lvFrom': (context) => p2hLvScreen(id: ModalRoute.of(context)!.settings.arguments as int),
+        '/bsForm': (context) => p2hBsScreen(id: ModalRoute.of(context)!.settings.arguments as int),
+        '/exForm': (context) => p2hExScreen(id: ModalRoute.of(context)!.settings.arguments as int),
+        '/timesheet': (context) => const TimesheetScreen(),
+        '/postscript': (context) => PostscriptScreen(),
       },
     );
   }

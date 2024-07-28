@@ -11,26 +11,14 @@ class SendEmailForgotPasswordScreen extends StatefulWidget {
 
 class _SendEmailForgotPasswordScreenState extends State<SendEmailForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-  final SendEmailService _sendEmailService = SendEmailService();
+  final AuthService _authService = AuthService();
 
 
   void _sendmail() async {
     final String email = _emailController.text;
 
-    // if (email.isEmpty) {
-    //   Flushbar(
-    //     message: 'Please enter an email address',
-    //     duration: const Duration(seconds: 3),
-    //     backgroundColor: Colors.redAccent,
-    //     flushbarPosition: FlushbarPosition.TOP,
-    //     margin: const EdgeInsets.all(8),
-    //     borderRadius: BorderRadius.circular(8),
-    //   ).show(context);
-    //   return;
-    // }
-
     try{
-      final response = await _sendEmailService.sendmail(email);
+      final response = await _authService.sendmail(email);
 
       if (response['status'] == 'success') {
         Flushbar(

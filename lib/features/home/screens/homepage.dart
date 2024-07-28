@@ -104,15 +104,23 @@ class _HomePageContentState extends State<HomePageContent> {
   String? _role;
   Future<int>? _p2hCountFuture;
   Future<int>? _kkhCountFuture;
+  Future<Map<String, dynamic>>? _lastP2hFuture;
+  Future<Map<String, dynamic>>? _lastKkhFuture;
 
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('id_ID');
-    _loadToken();
-    _p2hCountFuture = _fetchP2hData();
-    _kkhCountFuture = _fetchKkhData();
+    _loadToken().then((_) {
+      setState(() {
+        _p2hCountFuture = _fetchP2hData();
+        _kkhCountFuture = _fetchKkhData();
+        _lastP2hFuture = _fetchLastP2hData();
+        _lastKkhFuture = _fetchLastKkhData();
+      });
+    });
   }
+
 
   Future<void> _loadToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -130,7 +138,6 @@ class _HomePageContentState extends State<HomePageContent> {
       P2hServices p2hServices = P2hServices();
       return await p2hServices.getAllP2hLength();
     } catch (e) {
-      print('Error fetching P2H data: $e');
       return 0;
     }
   }
@@ -140,10 +147,38 @@ class _HomePageContentState extends State<HomePageContent> {
       KkhServices kkhServices = KkhServices();
       return await kkhServices.getAllKkhLength();
     } catch (e) {
-      print('Error fetching KKH data: $e');
       return 0;
     }
   }
+
+  Future<Map<String, dynamic>> _fetchLastP2hData() async {
+    try {
+      if (_token == null) {
+        throw Exception('Token is missing');
+      }
+      P2hServices p2hServices = P2hServices();
+      final data = await p2hServices.getLastP2hByUser(_token!);
+      return data['lastP2h']['P2h'];
+    } catch (e) {
+      print('Error fetching last P2H data: $e');
+      return {'date': 'N/A'};
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchLastKkhData() async {
+    try {
+      if (_token == null) {
+        throw Exception('Token is missing');
+      }
+      KkhServices kkhServices = KkhServices();
+      final data = await kkhServices.getLastKkhByUser(_token!);
+      return data['kkh'];
+    } catch (e) {
+      print('Error fetching last P2H data: $e');
+      return {'date': 'N/A'};
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -372,12 +407,41 @@ class _HomePageContentState extends State<HomePageContent> {
             'Submission Terakhir',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          _buildSubmissionItem('P2H Submission Data', '2 April 2024', Icons.settings, Colors.green),
-          _buildSubmissionItem('KKH Submission Data', '2 April 2024', Icons.work, Colors.blue),
+          FutureBuilder<Map<String, dynamic>>(
+            future: _lastP2hFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildSubmissionItem('P2H Submission', 'Loading...', Icons.settings, Colors.green);
+              } else if (snapshot.hasError) {
+                return _buildSubmissionItem('P2H Submission', 'Error', Icons.settings, Colors.green);
+              } else if (snapshot.hasData) {
+                String date = snapshot.data?['date'] ?? 'N/A';
+                return _buildSubmissionItem('P2H Submission', date, Icons.settings, Colors.green);
+              } else {
+                return _buildSubmissionItem('P2H Submission', 'No Data', Icons.settings, Colors.green);
+              }
+            },
+          ),
+          FutureBuilder<Map<String, dynamic>>(
+            future: _lastKkhFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildSubmissionItem('KKH Submission', 'Loading...', Icons.work, Colors.blue);
+              } else if (snapshot.hasError) {
+                return _buildSubmissionItem('KKH Submission', 'Error', Icons.work, Colors.blue);
+              } else if (snapshot.hasData) {
+                String date = snapshot.data?['date'] ?? 'N/A';
+                return _buildSubmissionItem('KKH Submission', date, Icons.work, Colors.blue);
+              } else {
+                return _buildSubmissionItem('KKH Submission', 'No Data', Icons.work, Colors.blue);
+              }
+            },
+          ),
         ],
       ),
     );
   }
+
 
   Widget _buildSubmissionItem(String title, String subtitle, IconData icon, Color iconColor) {
     return Padding(
