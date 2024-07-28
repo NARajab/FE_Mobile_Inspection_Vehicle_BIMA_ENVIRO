@@ -1,34 +1,45 @@
 import 'package:flutter/material.dart';
+import 'pphBl.dart';
+import 'pphBs.dart';
+import 'pphDt.dart';
+import 'pphLv.dart';
+import 'excavator/pphEx.dart';
+import '../homepage.dart';
 
 class p2hScreen extends StatelessWidget {
-  // Data untuk setiap item
-  final List<Map<String, String>> items = [
+  final List<Map<String, dynamic>> items = [
     {
+      'id': 1,
       'title': 'Bulldozer',
       'imagePath': 'assets/images/bl.png',
       'route': '/blForm'
     },
     {
+      'id': 2,
       'title': 'Dump Truck',
       'imagePath': 'assets/images/dt.png',
       'route': '/dtForm'
     },
     {
+      'id': 3,
       'title': 'Excavator',
       'imagePath': 'assets/images/ex.png',
-      'route' : '/exForm'
+      'route': '/exForm'
     },
     {
+      'id': 4,
       'title': 'Light Vehicle',
       'imagePath': 'assets/images/lv.png',
-      'route' : '/lvFrom'
+      'route': '/lvForm'
     },
     {
+      'id': 5,
       'title': 'Sarana Bus',
       'imagePath': 'assets/images/bus.png',
-      'route' : '/bsForm'
+      'route': '/bsForm'
     },
   ];
+
 
   p2hScreen({super.key});
 
@@ -76,7 +87,11 @@ class p2hScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, items[index]['route']!);
+              Navigator.pushNamed(
+                context,
+                items[index]['route']!,
+                arguments: items[index]['id'],
+              );
             },
             child: _buildItemCard(items[index]['title']!, items[index]['imagePath']!, 150, 150),
           );
@@ -117,5 +132,23 @@ class p2hScreen extends StatelessWidget {
   void _navigateBack(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/home');
   }
+
+  Widget _getNextScreen(String route, int id) {
+    switch (route) {
+      case '/blForm':
+        return p2hBlScreen(id: id);
+      case '/dtForm':
+        return p2hDtScreen(id: id);
+      case '/exForm':
+        return p2hExScreen(id: id);
+      case '/lvForm':
+        return p2hLvScreen(id: id);
+      case '/bsForm':
+        return p2hBsScreen(id: id);
+      default:
+        return const HomePage();
+    }
+  }
+
 }
 

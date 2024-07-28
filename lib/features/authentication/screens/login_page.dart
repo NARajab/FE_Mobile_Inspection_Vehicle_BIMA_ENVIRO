@@ -32,6 +32,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (result['status'] == 'success') {
         final token = result['token'];
+        final role = result['role'];
+
+        if (role == 'SuperAdmin') {
+          Flushbar(
+            message: 'SuperAdmin access is not allowed.',
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.red,
+            flushbarPosition: FlushbarPosition.TOP,
+            margin: const EdgeInsets.all(8),
+            borderRadius: BorderRadius.circular(8),
+          ).show(context);
+          return;
+        }
+
+
         if (token != null) {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
@@ -45,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
             borderRadius: BorderRadius.circular(8),
           ).show(context);
 
-          await Future.delayed(const Duration(seconds: 3));
+          await Future.delayed(const Duration(seconds: 2));
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

@@ -19,7 +19,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _passwordVisible = false;
   String _selectedRole = 'Driver';
 
-  final RegisterService _registerService = RegisterService();
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +274,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final String role = _selectedRole;
 
     try {
-      final response = await _registerService.register(username, email, password, phoneNumber, role);
+      final response = await _authService.register(username, email, password, phoneNumber, role);
 
       if (response['status'] == 'success') {
         Flushbar(
@@ -285,7 +285,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           margin: const EdgeInsets.all(8),
           borderRadius: BorderRadius.circular(8),
         ).show(context);
-        await Future.delayed(const Duration(seconds: 5));
+        await Future.delayed(const Duration(seconds: 3));
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),

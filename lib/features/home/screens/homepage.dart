@@ -8,8 +8,11 @@ import 'package:myapp/features/home/screens/forman/foremankkh.dart';
 import 'package:myapp/features/home/screens/forman/foremanp2h.dart';
 import 'package:myapp/features/home/screens/kkh.dart';
 import 'package:myapp/features/home/screens/p2h/pph.dart';
+import 'package:myapp/features/home/services/p2h_services.dart';
+import 'package:myapp/features/home/services/kkh_services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -25,7 +28,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     const HomePageContent(),
     const HistoryScreen(),
     const SettingScreen(),
-    // Container()
   ];
 
   @override
@@ -99,20 +101,84 @@ class HomePageContent extends StatefulWidget {
 class _HomePageContentState extends State<HomePageContent> {
   int _currentPage = 0;
   String? _token;
+  String? _role;
+  Future<int>? _p2hCountFuture;
+  Future<int>? _kkhCountFuture;
+  Future<Map<String, dynamic>>? _lastP2hFuture;
+  Future<Map<String, dynamic>>? _lastKkhFuture;
 
   @override
   void initState() {
     super.initState();
     initializeDateFormatting('id_ID');
-    _loadToken();
+    _loadToken().then((_) {
+      setState(() {
+        _p2hCountFuture = _fetchP2hData();
+        _kkhCountFuture = _fetchKkhData();
+        _lastP2hFuture = _fetchLastP2hData();
+        _lastKkhFuture = _fetchLastKkhData();
+      });
+    });
   }
+
 
   Future<void> _loadToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _token = prefs.getString('token');
+      if (_token != null) {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(_token!);
+        _role = decodedToken['role'];
+      }
     });
   }
+
+  Future<int> _fetchP2hData() async {
+    try {
+      P2hServices p2hServices = P2hServices();
+      return await p2hServices.getAllP2hLength();
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<int> _fetchKkhData() async {
+    try {
+      KkhServices kkhServices = KkhServices();
+      return await kkhServices.getAllKkhLength();
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchLastP2hData() async {
+    try {
+      if (_token == null) {
+        throw Exception('Token is missing');
+      }
+      P2hServices p2hServices = P2hServices();
+      final data = await p2hServices.getLastP2hByUser(_token!);
+      return data['lastP2h']['P2h'];
+    } catch (e) {
+      print('Error fetching last P2H data: $e');
+      return {'date': 'N/A'};
+    }
+  }
+
+  Future<Map<String, dynamic>> _fetchLastKkhData() async {
+    try {
+      if (_token == null) {
+        throw Exception('Token is missing');
+      }
+      KkhServices kkhServices = KkhServices();
+      final data = await kkhServices.getLastKkhByUser(_token!);
+      return data['kkh'];
+    } catch (e) {
+      print('Error fetching last P2H data: $e');
+      return {'date': 'N/A'};
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -202,8 +268,34 @@ class _HomePageContentState extends State<HomePageContent> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildCounter('Total Submisi P2H Saat Ini', '100 KALI'),
-                _buildCounter('Total Submisi KKH Saat Ini', '100 KALI'),
+                FutureBuilder<int>(
+                  future: _p2hCountFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return _buildCounter('Total Submission P2H Saat Ini', 'Loading...');
+                    } else if (snapshot.hasError) {
+                      return _buildCounter('Total Submission P2H Saat Ini', 'Error');
+                    } else if (snapshot.hasData) {
+                      return _buildCounter('Total Submission P2H Saat Ini', '${snapshot.data} KALI');
+                    } else {
+                      return _buildCounter('Total Submission P2H Saat Ini', '0 KALI');
+                    }
+                  },
+                ),
+                FutureBuilder(
+                  future: _kkhCountFuture,
+                  builder: (context, snapshot){
+                    if(snapshot.connectionState == ConnectionState.waiting){
+                      return _buildCounter('Total Submission KKH Saat Ini', 'Loading...');
+                    } else if (snapshot.hasError) {
+                      return _buildCounter('Total Submission KKH Saat Ini', 'Error');
+                    } else if (snapshot.hasData) {
+                      return _buildCounter('Total Submission KKH Saat Ini', '${snapshot.data} KALI');
+                    } else {
+                      return _buildCounter('Total Submission KKH Saat Ini', '0 KALI');
+                    }
+                  }
+                ),
               ],
             ),
           ),
@@ -242,8 +334,8 @@ class _HomePageContentState extends State<HomePageContent> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildOptionCard(context, 'P2H', Icons.settings, 'foreman'),
-          _buildOptionCard(context, 'KKH', Icons.work, 'foreman'),
+          _buildOptionCard(context, 'P2H', Icons.settings, '$_role'),
+          _buildOptionCard(context, 'KKH', Icons.work, '$_role'),
         ],
       ),
     );
@@ -253,24 +345,24 @@ class _HomePageContentState extends State<HomePageContent> {
     return GestureDetector(
       onTap: () {
         if (title == 'P2H') {
-          if (role == 'driver') {
+          if (role == 'Driver') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => p2hScreen()),
             );
-          } else if (role == 'foreman') {
+          } else if (role == 'Forman') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ForemanP2h()),
             );
           }
         } else if (title == 'KKH') {
-          if (role == 'driver') {
+          if (role == 'Driver') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const KkhScreen()),
             );
-          } else if (role == 'foreman') {
+          } else if (role == 'Forman') {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ForemanKkh()),
@@ -315,12 +407,41 @@ class _HomePageContentState extends State<HomePageContent> {
             'Submission Terakhir',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          _buildSubmissionItem('P2H Submission Data', '2 April 2024', Icons.settings, Colors.green),
-          _buildSubmissionItem('KKH Submission Data', '2 April 2024', Icons.work, Colors.blue),
+          FutureBuilder<Map<String, dynamic>>(
+            future: _lastP2hFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildSubmissionItem('P2H Submission', 'Loading...', Icons.settings, Colors.green);
+              } else if (snapshot.hasError) {
+                return _buildSubmissionItem('P2H Submission', 'Error', Icons.settings, Colors.green);
+              } else if (snapshot.hasData) {
+                String date = snapshot.data?['date'] ?? 'N/A';
+                return _buildSubmissionItem('P2H Submission', date, Icons.settings, Colors.green);
+              } else {
+                return _buildSubmissionItem('P2H Submission', 'No Data', Icons.settings, Colors.green);
+              }
+            },
+          ),
+          FutureBuilder<Map<String, dynamic>>(
+            future: _lastKkhFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return _buildSubmissionItem('KKH Submission', 'Loading...', Icons.work, Colors.blue);
+              } else if (snapshot.hasError) {
+                return _buildSubmissionItem('KKH Submission', 'Error', Icons.work, Colors.blue);
+              } else if (snapshot.hasData) {
+                String date = snapshot.data?['date'] ?? 'N/A';
+                return _buildSubmissionItem('KKH Submission', date, Icons.work, Colors.blue);
+              } else {
+                return _buildSubmissionItem('KKH Submission', 'No Data', Icons.work, Colors.blue);
+              }
+            },
+          ),
         ],
       ),
     );
   }
+
 
   Widget _buildSubmissionItem(String title, String subtitle, IconData icon, Color iconColor) {
     return Padding(
