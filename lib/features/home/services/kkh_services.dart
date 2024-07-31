@@ -6,14 +6,13 @@ class KkhServices {
   final String baseUrl = dotenv.env['API_URL']!;
 
   Future<int> getAllKkhLength() async {
-    const String endpoint = '/kkh';
+    const String endpoint = '/kkh/length';
     final String apiUrl = '$baseUrl$endpoint';
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(response.body);
-        List<dynamic> kkhList = responseData['kkh'];
-        return kkhList.length;
+        return responseData['length'];
       } else {
         throw Exception('Failed to load data');
       }

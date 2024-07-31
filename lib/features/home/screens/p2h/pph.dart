@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/home/screens/p2h/timesheet/location.dart';
 import 'pphBl.dart';
 import 'pphBs.dart';
 import 'pphDt.dart';
 import 'pphLv.dart';
-import 'excavator/pphEx.dart';
+import 'pphEx.dart';
 import '../homepage.dart';
 
 class p2hScreen extends StatelessWidget {
@@ -38,8 +39,12 @@ class p2hScreen extends StatelessWidget {
       'imagePath': 'assets/images/bus.png',
       'route': '/bsForm'
     },
+    {
+      'title': 'Timesheet',
+      'imagePath': 'assets/images/timesheet.png',
+      'route': '/location'
+    },
   ];
-
 
   p2hScreen({super.key});
 
@@ -52,9 +57,9 @@ class p2hScreen extends StatelessWidget {
         elevation: 5,
         shadowColor: Colors.black,
         titleTextStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w400
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w400
         ),
         toolbarHeight: 45,
         leading: IconButton(
@@ -87,11 +92,18 @@ class p2hScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.pushNamed(
-                context,
-                items[index]['route']!,
-                arguments: items[index]['id'],
-              );
+              if (items[index].containsKey('id')) {
+                Navigator.pushNamed(
+                  context,
+                  items[index]['route']!,
+                  arguments: items[index]['id'],
+                );
+              } else {
+                Navigator.pushNamed(
+                  context,
+                  items[index]['route']!,
+                );
+              }
             },
             child: _buildItemCard(items[index]['title']!, items[index]['imagePath']!, 150, 150),
           );
@@ -101,33 +113,33 @@ class p2hScreen extends StatelessWidget {
   }
 
   Widget _buildItemCard(String title, String imagePath, double width, double height) {
-  return SizedBox(
-    width: width,
-    height: height,
-    child: Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8.0),
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              imagePath,
+              width: width * 0.6,
+              height: height * 0.6,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            imagePath,
-            width: width * 0.6,
-            height: height * 0.6,
-            fit: BoxFit.contain,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+    );
+  }
 
   void _navigateBack(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/home');
@@ -145,10 +157,10 @@ class p2hScreen extends StatelessWidget {
         return p2hLvScreen(id: id);
       case '/bsForm':
         return p2hBsScreen(id: id);
+      case '/location':
+        return const LocationScreen();
       default:
         return const HomePage();
     }
   }
-
 }
-
