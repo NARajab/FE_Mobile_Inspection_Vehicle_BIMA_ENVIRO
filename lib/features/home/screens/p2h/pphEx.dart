@@ -439,7 +439,7 @@ class _p2hScreenState extends State<p2hExScreen> {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          _navigateTs(context);
+                          submitData();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF304FFE),
@@ -464,8 +464,5 @@ class _p2hScreenState extends State<p2hExScreen> {
 
   void _navigateBack(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/p2h');
-  }
-  void _navigateTs(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/timesheet');
   }
 }

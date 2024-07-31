@@ -73,11 +73,15 @@ class _p2hScreenState extends State<p2hDtScreen> {
   TextEditingController modelUnitController = TextEditingController();
   TextEditingController nomorUnitController = TextEditingController();
   TextEditingController shiftController = TextEditingController();
-  TextEditingController namaDriverController = TextEditingController();
   TextEditingController hmAwalController = TextEditingController();
   TextEditingController hmAkhirController = TextEditingController();
   TextEditingController kmAwalController = TextEditingController();
   TextEditingController kmAkhirController = TextEditingController();
+  TextEditingController aroundUnitNotesController = TextEditingController();
+  TextEditingController inTheCabinNotesController = TextEditingController();
+  TextEditingController machineRoomNotesController = TextEditingController();
+
+  Map<String, TextEditingController> notesControllers = {};
 
   @override
   void initState() {
@@ -87,7 +91,13 @@ class _p2hScreenState extends State<p2hDtScreen> {
         itemChecklist[item['field'] ?? ''] = false;
       }
     }
+    notesControllers = {
+      'Pemeriksaan Keliling Unit': aroundUnitNotesController,
+      'Pemeriksaan di dalam kabin': inTheCabinNotesController,
+      'Pemeriksaan di ruang mesin': machineRoomNotesController,
+    };
   }
+
 
   @override
   void dispose() {
@@ -95,11 +105,13 @@ class _p2hScreenState extends State<p2hDtScreen> {
     modelUnitController.dispose();
     nomorUnitController.dispose();
     shiftController.dispose();
-    namaDriverController.dispose();
     hmAwalController.dispose();
     hmAkhirController.dispose();
     kmAwalController.dispose();
     kmAkhirController.dispose();
+    aroundUnitNotesController.dispose();
+    inTheCabinNotesController.dispose();
+    machineRoomNotesController.dispose();
     super.dispose();
   }
 
@@ -113,12 +125,13 @@ class _p2hScreenState extends State<p2hDtScreen> {
       'modelu': modelUnitController.text.trim(),
       'nou': nomorUnitController.text.trim(),
       'shift': shiftController.text.trim(),
-      'namaDriver': namaDriverController.text.trim(),
       'earlyhm': hmAwalController.text.trim(),
       'endhm': hmAkhirController.text.trim(),
-      'kmAwal': kmAwalController.text.trim(),
-      'kmAkhir': kmAkhirController.text.trim(),
-      'notes': textEditingController.text.trim(),
+      'earlykm': kmAwalController.text.trim(),
+      'endkm': kmAkhirController.text.trim(),
+      'ntsAroundU': aroundUnitNotesController.text.trim(),
+      'ntsInTheCabinU': inTheCabinNotesController.text.trim(),
+      'ntsMachineRoom': machineRoomNotesController.text.trim(),
     };
 
     Map<String, dynamic> requestData = {
@@ -127,11 +140,8 @@ class _p2hScreenState extends State<p2hDtScreen> {
       'idVehicle': widget.id
     };
 
-    print('Request Data: $requestData'); // Debug statement
-
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
-    print('Token: $token'); // Debug statement
 
     if (token != null) {
       FormServices formServices = FormServices();
@@ -142,22 +152,23 @@ class _p2hScreenState extends State<p2hDtScreen> {
           message: 'Data submitted successfully!',
           duration: const Duration(seconds: 3),
           backgroundColor: Colors.green,
-        ).show(context);
+        ).show(context).then((_) {
+          _navigateBack(context);
+        });
 
-        // Clear the form after successful submission
-        textEditingController.clear();
         modelUnitController.clear();
         nomorUnitController.clear();
         shiftController.clear();
-        namaDriverController.clear();
         hmAwalController.clear();
         hmAkhirController.clear();
         kmAwalController.clear();
         kmAkhirController.clear();
+        aroundUnitNotesController.clear();
+        inTheCabinNotesController.clear();
+        machineRoomNotesController.clear();
         itemChecklist.updateAll((key, value) => false);
 
       } catch (error) {
-        print('Submission Error: $error'); // Debug statement
         Flushbar(
           title: 'Error',
           message: 'Failed to submit data: $error',
@@ -173,6 +184,87 @@ class _p2hScreenState extends State<p2hDtScreen> {
         backgroundColor: Colors.red,
       ).show(context);
     }
+  }
+
+
+
+  Widget _buildTextField(
+      TextEditingController controller,
+      String labelText, {
+        TextInputType keyboardType = TextInputType.text,
+      }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+      keyboardType: keyboardType,
+    );
+  }
+
+  Widget _buildChecklistCard(String title, List<Map<String, String>> items) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: items.map((item) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text(item['item'] ?? '')),
+                    const SizedBox(width: 10),
+                    Text(item['kbj'] ?? ''),
+                    const SizedBox(width: 10),
+                    Checkbox(
+                      value: itemChecklist[item['field']],
+                      onChanged: (value) {
+                        setState(() {
+                          itemChecklist[item['field'] ?? ''] = value ?? false;
+                        });
+                      },
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+            // Ensure 'title' here matches the key used in 'notesControllers'
+            TextField(
+              controller: notesControllers[title],
+              decoration: const InputDecoration(
+                labelText: 'Catatan atau temuan',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
+
+  Widget _buildNotesSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: importantNotes.map((note) {
+            return Text(
+              note,
+              style: const TextStyle(fontSize: 16),
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -210,195 +302,55 @@ class _p2hScreenState extends State<p2hDtScreen> {
         ),
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
-              elevation: 4,
-              margin: const EdgeInsets.only(top: 20, left: 8, right: 8, bottom: 10),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: Text('ID Kendaraan: ${widget.id}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    TextFormField(
-                      controller: modelUnitController,
-                      decoration: const InputDecoration(
-                        labelText: 'Model Unit',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: nomorUnitController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nomor Unit',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: shiftController,
-                      decoration: const InputDecoration(
-                        labelText: 'Shift',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: namaDriverController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nama Driver',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: hmAwalController,
-                      decoration: const InputDecoration(
-                        labelText: 'HM Awal',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: hmAkhirController,
-                      decoration: const InputDecoration(
-                        labelText: 'HM Akhir',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: kmAwalController,
-                      decoration: const InputDecoration(
-                        labelText: 'KM Awal',
-                      ),
-                    ),
-                    TextFormField(
-                      controller: kmAkhirController,
-                      decoration: const InputDecoration(
-                        labelText: 'KM Akhir',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            _buildTextField(modelUnitController, 'Model Unit'),
+            _buildTextField(nomorUnitController, 'Nomor Unit'),
+            _buildTextField(shiftController, 'Shift'),
+            _buildTextField(hmAwalController, 'HM Awal', keyboardType: TextInputType.number),
+            _buildTextField(hmAkhirController, 'HM Akhir', keyboardType: TextInputType.number),
+            _buildTextField(kmAwalController, 'KM Awal', keyboardType: TextInputType.number),
+            _buildTextField(kmAkhirController, 'KM Akhir', keyboardType: TextInputType.number),
+            const SizedBox(height: 16.0),
+            Column(
+              children: cardItems.asMap().entries.map((entry) {
+                int index = entry.key;
+                List<Map<String, String>> items = entry.value;
+                return _buildChecklistCard(cardTitles[index], items);
+              }).toList(),
             ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: cardItems.length,
-              itemBuilder: (context, index) {
-                return buildChecklistCard(cardTitles[index], cardItems[index]);
-              },
-            ),
-            Container(
-              color: Colors.white,
-              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: importantNotes.map((note) {
-                  return Text(
-                    note,
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  );
-                }).toList(),
-              ),
-            ),
-            Container(
-              color: Colors.white,
-              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-              padding: const EdgeInsets.all(10),
+            const SizedBox(height: 16.0),
+            _buildNotesSection(),
+            const SizedBox(height: 10.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 7),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Catatan Penting:',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  TextField(
-                    controller: textEditingController,
-                    maxLines: 5,
-                    decoration: const InputDecoration(
-                      hintText: 'Masukkan catatan penting...',
+                  ElevatedButton(
+                    onPressed: submitData,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF304FFE),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                      ),
+                      foregroundColor: Colors.white,
+                      elevation: 5,
                     ),
+                    child: const Text('Submit'),
                   ),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: ElevatedButton(
-                onPressed: submitData,
-                child: const Text('Submit'),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
-
-  Widget buildChecklistCard(String title, List<Map<String, String>> items) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                String field = items[index]['field'] ?? '';
-                String kbj = items[index]['kbj'] ?? '';
-                return ListTile(
-                  leading: Container(
-                    width: 30, // adjust width as needed
-                    alignment: Alignment.center,
-                    child: Text(
-                      kbj,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  title: Text(items[index]['item'] ?? ''),
-                  trailing: Checkbox(
-                    value: itemChecklist[field] ?? false,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        itemChecklist[field] = value ?? false;
-                      });
-                    },
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-
-
-
 
   void _navigateBack(BuildContext context) {
-    Navigator.of(context).pop();
+    Navigator.pushReplacementNamed(context, '/p2h');
   }
 }

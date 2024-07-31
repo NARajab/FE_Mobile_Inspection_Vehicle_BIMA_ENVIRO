@@ -5,9 +5,10 @@ import 'package:myapp/features/Setting/screens/profile.dart';
 import 'package:myapp/features/authentication/screens/forgot_password.dart';
 import 'package:myapp/features/history/screens/history.dart';
 import 'package:myapp/features/home/screens/kkh.dart';
-import 'package:myapp/features/home/screens/p2h/excavator/postscript.dart';
-import 'package:myapp/features/home/screens/p2h/excavator/pphEx.dart';
-import 'package:myapp/features/home/screens/p2h/excavator/timesheet.dart';
+import 'package:myapp/features/home/screens/p2h/timesheet/postscript.dart';
+import 'package:myapp/features/home/screens/p2h/pphEx.dart';
+import 'package:myapp/features/home/screens/p2h/timesheet/timesheet.dart';
+import 'package:myapp/features/home/screens/p2h/timesheet/location.dart';
 import 'package:myapp/features/home/screens/p2h/pph.dart';
 import 'package:myapp/features/home/screens/p2h/pphBl.dart';
 import 'package:myapp/features/home/screens/p2h/pphBs.dart';
@@ -64,11 +65,12 @@ class _MyAppState extends State<MyApp> {
         '/kkh': (context) => const KkhScreen(),
         '/blForm': (context) => p2hBlScreen(id: ModalRoute.of(context)!.settings.arguments as int),
         '/dtForm': (context) => p2hDtScreen(id: ModalRoute.of(context)!.settings.arguments as int),
-        '/lvFrom': (context) => p2hLvScreen(id: ModalRoute.of(context)!.settings.arguments as int),
+        '/lvForm': (context) => p2hLvScreen(id: ModalRoute.of(context)!.settings.arguments as int),
         '/bsForm': (context) => p2hBsScreen(id: ModalRoute.of(context)!.settings.arguments as int),
         '/exForm': (context) => p2hExScreen(id: ModalRoute.of(context)!.settings.arguments as int),
-        '/timesheet': (context) => const TimesheetScreen(),
-        '/postscript': (context) => PostscriptScreen(),
+        '/location': (context) => const LocationScreen()
+        // '/timesheet': (context) => (),
+        // '/postscript': (context) => PostscriptScreen(),
       },
     );
   }

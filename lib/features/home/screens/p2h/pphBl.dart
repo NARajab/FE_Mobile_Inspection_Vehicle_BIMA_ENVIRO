@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import '../../services/p2h_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class p2hBlScreen extends StatefulWidget {
   final int id;
@@ -14,36 +15,36 @@ class p2hBlScreen extends StatefulWidget {
 class _p2hScreenState extends State<p2hBlScreen> {
   List<List<Map<String, String>>> cardItems = [
     [
-      {'item': 'Kondisi Underacarriage', 'kbj' : 'A'}, 
-      {'item': 'Kerusakan akibat insiden ***)', 'kbj': 'AA'}, 
-      {'item': 'Level oli transmisi & kebocoran', 'kbj': 'AA'}, 
-      {'item': 'Level oli damper & kebocoran', 'kbj' : 'AA'}, 
-      {'item': 'Level oli pivot & kebocoran', 'kbj': 'AA'}, 
-      {'item': 'Level oli hydraulic & kebocoran', 'kbj': 'AA'}, 
-      {'item': 'Fuel drain / Buang air dari tanki BBC', 'kbj': 'A'}, 
-      {'item': 'BBC minimum 25% dari Cap. Tangki', 'kbj' : 'A'}, 
-      {'item': 'Kebersihan accessories safety & Alat', 'kbj': 'A'}, 
-      {'item': 'Kebocoran2 bila ada (oli, solar, grease)', 'kbj': 'A'}, 
-      {'item': 'Back alarm / Alarm mundur', 'kbj' : 'AA'},  
-      {'item': 'Kebersihan aki / battery', 'kbj' : 'A'}
+      {'item': 'Kondisi Underacarriage', 'field': 'ku', 'kbj' : 'A'},
+      {'item': 'Kerusakan akibat insiden ***)', 'field': 'kai', 'kbj': 'AA'},
+      {'item': 'Level oli transmisi & kebocoran', 'field': 'lotk', 'kbj': 'AA'},
+      {'item': 'Level oli damper & kebocoran', 'field': 'lodk', 'kbj' : 'AA'},
+      {'item': 'Level oli pivot & kebocoran', 'field': 'lopk', 'kbj': 'AA'},
+      {'item': 'Level oli hydraulic & kebocoran', 'field': 'lohk', 'kbj': 'AA'},
+      {'item': 'Fuel drain / Buang air dari tanki BBC', 'field': 'fd', 'kbj': 'A'},
+      {'item': 'BBC minimum 25% dari Cap. Tangki', 'field': 'bbcmin', 'kbj' : 'A'},
+      {'item': 'Kebersihan accessories safety & Alat', 'field': 'kasa', 'kbj': 'A'},
+      {'item': 'Kebocoran2 bila ada (oli, solar, grease)', 'field': 'kba', 'kbj': 'A'},
+      {'item': 'Back alarm / Alarm mundur', 'field': 'ba', 'kbj' : 'AA'},
+      {'item': 'Kebersihan aki / battery', 'field': 'ka', 'kbj' : 'A'}
     ],
     [
-      {'item':'Air conditioner (AC)', 'kbj': 'A'}, 
-      {'item':'Fungsi steering / kemudi', 'kbj':'AA'},
-      {'item':'Fungsi seat belt / sabuk pengaman', 'kbj':'AA'}, 
-      {'item':'Fungsi semua lampu', 'kbj': 'AA'}, 
-      {'item':'Fungsi Rotary lamp', 'kbj':'AA'}, 
-      {'item':'Fungsi mirror / spion', 'kbj': 'A'},
-      {'item':'Fungsi wiper dan air wiper', 'kbj': 'A'},
-      {'item':'Fungsi kontrol panel', 'kbj': 'AA'}, 
-      {'item':'Fungsi horn / klakson', 'kbj': 'AA'}, 
-      {'item':'Fire Extinguiser / APAR', 'kbj': 'AA'},
-      {'item':'Fungsi radio komunikasi', 'kbj': 'AA'}, 
-      {'item':'Kebersihan ruang kabin', 'kbj': 'A'},
+      {'item':'Air conditioner (AC)', 'field': 'ac', 'kbj': 'A'},
+      {'item':'Fungsi steering / kemudi', 'field': 'fs', 'kbj':'AA'},
+      {'item':'Fungsi seat belt / sabuk pengaman', 'field': 'fsb', 'kbj':'AA'},
+      {'item':'Fungsi semua lampu', 'field': 'fsl', 'kbj': 'AA'},
+      {'item':'Fungsi Rotary lamp', 'field': 'frl', 'kbj':'AA'},
+      {'item':'Fungsi mirror / spion', 'field': 'fm', 'kbj': 'A'},
+      {'item':'Fungsi wiper dan air wiper', 'field': 'fwadaw', 'kbj': 'A'},
+      {'item':'Fungsi kontrol panel', 'field': 'fkp', 'kbj': 'AA'},
+      {'item':'Fungsi horn / klakson', 'field': 'fh', 'kbj': 'AA'},
+      {'item':'Fire Extinguiser / APAR', 'field': 'feapar', 'kbj': 'AA'},
+      {'item':'Fungsi radio komunikasi', 'field': 'frk', 'kbj': 'AA'},
+      {'item':'Kebersihan ruang kabin', 'field': 'krk', 'kbj': 'A'},
     ],
     [
-      {'item':'Air Radiator', 'kbj': 'AA'}, 
-      {'item':'Oil Engine / Oli Mesin', 'kbj': 'AA'}, 
+      {'item':'Air Radiator', 'field': 'ar', 'kbj': 'AA'},
+      {'item':'Oil Engine / Oli Mesin', 'field': 'oe', 'kbj': 'AA'},
     ],
   ];
 
@@ -69,22 +70,29 @@ class _p2hScreenState extends State<p2hBlScreen> {
   TextEditingController modelUnitController = TextEditingController();
   TextEditingController nomorUnitController = TextEditingController();
   TextEditingController shiftController = TextEditingController();
-  TextEditingController namaDriverController = TextEditingController();
   TextEditingController hmAwalController = TextEditingController();
   TextEditingController hmAkhirController = TextEditingController();
-  TextEditingController kmAwalController = TextEditingController();
-  TextEditingController kmAkhirController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
   TextEditingController jobSiteController = TextEditingController();
   TextEditingController lokasiController = TextEditingController();
+  TextEditingController aroundUnitNotesController = TextEditingController();
+  TextEditingController inTheCabinNotesController = TextEditingController();
+  TextEditingController machineRoomNotesController = TextEditingController();
+  Map<String, TextEditingController> notesControllers = {};
 
   @override
   void initState() {
     super.initState();
     for (var items in cardItems) {
       for (var item in items) {
-        itemChecklist[item['item'] ?? ''] = false;
+        itemChecklist[item['field'] ?? ''] = false;
       }
     }
+    notesControllers = {
+      'Pemeriksaan Keliling Unit': aroundUnitNotesController,
+      'Pemeriksaan di dalam kabin': inTheCabinNotesController,
+      'Pemeriksaan di ruang mesin': machineRoomNotesController,
+    };
   }
 
   @override
@@ -93,61 +101,162 @@ class _p2hScreenState extends State<p2hBlScreen> {
     modelUnitController.dispose();
     nomorUnitController.dispose();
     shiftController.dispose();
-    namaDriverController.dispose();
     hmAwalController.dispose();
     hmAkhirController.dispose();
-    kmAwalController.dispose();
-    kmAkhirController.dispose();
     jobSiteController.dispose();
     lokasiController.dispose();
+    aroundUnitNotesController.dispose();
+    inTheCabinNotesController.dispose();
+    machineRoomNotesController.dispose();
     super.dispose();
   }
 
   void submitData() async {
-    Map<String, bool> checklistData = {};
+    Map<String, int> checklistData = {};
     itemChecklist.forEach((key, value) {
-      checklistData[key] = value;
+      checklistData[key] = value ? 1 : 0;
     });
 
     Map<String, String> inputData = {
       'modelu': modelUnitController.text.trim(),
       'nou': nomorUnitController.text.trim(),
       'shift': shiftController.text.trim(),
-      'namaDriver': namaDriverController.text.trim(),
       'earlyhm': hmAwalController.text.trim(),
       'endhm': hmAkhirController.text.trim(),
-      'kmAwal': kmAwalController.text.trim(),
-      'kmAkhir': kmAkhirController.text.trim(),
-      'notes': textEditingController.text.trim(),
+      'time': timeController.text.trim(),
+      'ntsAroundU': aroundUnitNotesController.text.trim(),
+      'ntsInTheCabinU': inTheCabinNotesController.text.trim(),
+      'ntsMachineRoom': machineRoomNotesController.text.trim(),
+      'jobsite': jobSiteController.text.trim(),
+      'location': lokasiController.text.trim()
     };
 
     Map<String, dynamic> requestData = {
       ...checklistData,
       ...inputData,
-      'id': widget.id,
+      'idVehicle': widget.id,
     };
 
-    final response = await http.post(
-      Uri.parse('https://your-backend-url.com/api/endpoint'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(requestData),
-    );
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
-    if (response.statusCode == 200) {
-      print('Data submitted successfully');
+    if (token != null) {
+      FormServices formServices = FormServices();
+      try {
+        await formServices.submitP2hBl(requestData, token);
+        Flushbar(
+          title: 'Success',
+          message: 'Data submitted successfully!',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.green,
+        ).show(context).then((_) {
+          _navigateBack(context);
+        });
+
+
+        textEditingController.clear();
+        modelUnitController.clear();
+        nomorUnitController.clear();
+        shiftController.clear();
+        hmAwalController.clear();
+        hmAkhirController.clear();
+        timeController.clear();
+
+      } catch (error) {
+        Flushbar(
+          title: 'Error',
+          message: 'Failed to submit data: $error',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.red,
+        ).show(context);
+      }
     } else {
-      print('Failed to submit data');
+      Flushbar(
+        title: 'Error',
+        message: 'Token not found',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+      ).show(context);
     }
+  }
 
-    textEditingController.clear();
-    modelUnitController.clear();
-    nomorUnitController.clear();
-    shiftController.clear();
-    namaDriverController.clear();
-    hmAwalController.clear();
-    hmAkhirController.clear();
-    kmAwalController.clear();
-    kmAkhirController.clear();
+  Widget _buildTextField(
+      TextEditingController controller,
+      String labelText, {
+        TextInputType keyboardType = TextInputType.text,
+        GestureTapCallback? onTap
+      }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+      ),
+      keyboardType: keyboardType,
+      onTap: onTap,
+      readOnly: false,
+    );
+  }
+
+  Widget _buildChecklistCard(String title, List<Map<String, String>> items) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Column(
+              children: items.map((item) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text(item['item'] ?? '')),
+                    const SizedBox(width: 10),
+                    Text(item['kbj'] ?? ''),
+                    const SizedBox(width: 10),
+                    Checkbox(
+                      value: itemChecklist[item['field']],
+                      onChanged: (value) {
+                        setState(() {
+                          itemChecklist[item['field'] ?? ''] = value ?? false;
+                        });
+                      },
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+            TextField(
+              controller: notesControllers[title],
+              decoration: const InputDecoration(
+                labelText: 'Catatan atau temuan',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotesSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: importantNotes.map((note) {
+            return Text(
+              note,
+              style: const TextStyle(fontSize: 16),
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   @override
@@ -162,7 +271,7 @@ class _p2hScreenState extends State<p2hBlScreen> {
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
-          fontWeight: FontWeight.w400
+          fontWeight: FontWeight.w400,
         ),
         toolbarHeight: 45,
         leading: IconButton(
@@ -185,229 +294,75 @@ class _p2hScreenState extends State<p2hBlScreen> {
         ),
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Card(
-              elevation: 4,
-              margin: const EdgeInsets.only(top: 20, left: 8, right: 8),
+            _buildTextField(
+              modelUnitController,
+              'Model Unit',
+            ),
+            _buildTextField(
+              nomorUnitController,
+              'Nomor Unit',
+            ),
+            _buildTextField(
+              timeController,
+              'Jam',
+              onTap: () => _selectTime(context, timeController),
+            ),
+            _buildTextField(
+              shiftController,
+              'Shift',
+            ),
+            _buildTextField(
+              hmAwalController,
+              'HM Awal',
+              keyboardType: TextInputType.number,
+            ),
+            _buildTextField(
+              hmAkhirController,
+              'HM Akhir',
+              keyboardType: TextInputType.number,
+            ),
+            _buildTextField(
+              jobSiteController,
+              'Job Site',
+            ),
+            _buildTextField(
+              lokasiController,
+              'Lokasi',
+            ),
+            const SizedBox(height: 16.0),
+            Column(
+              children: cardItems.asMap().entries.map((entry) {
+                int index = entry.key;
+                List<Map<String, String>> items = entry.value;
+                return _buildChecklistCard(cardTitles[index], items);
+              }).toList(),
+            ),
+            const SizedBox(height: 16.0),
+            _buildNotesSection(),
+            const SizedBox(height: 10.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 7),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Text(
-                      'Data Kendaraan',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: modelUnitController,
-                      decoration: const InputDecoration(
-                        labelText: 'Model Unit',
-                        border: OutlineInputBorder(),
+                  ElevatedButton(
+                    onPressed: submitData,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF304FFE),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
                       ),
+                      foregroundColor: Colors.white,
+                      elevation: 5,
                     ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: nomorUnitController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nomor Unit',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: shiftController,
-                      decoration: const InputDecoration(
-                        labelText: 'Shift',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: namaDriverController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nama Operator',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: hmAwalController,
-                      decoration: const InputDecoration(
-                        labelText: 'HM Awal',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: hmAkhirController,
-                      decoration: const InputDecoration(
-                        labelText: 'HM Akhir',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: kmAwalController,
-                      decoration: const InputDecoration(
-                        labelText: 'KM Awal',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: kmAkhirController,
-                      decoration: const InputDecoration(
-                        labelText: 'KM Akhir',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: jobSiteController,
-                      decoration: const InputDecoration(
-                        labelText: 'Job Site',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  ListTile(
-                    title: TextField(
-                      controller: lokasiController,
-                      decoration: const InputDecoration(
-                        labelText: 'Lokasi',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
+                    child: const Text('Submit'),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-            const Divider(thickness: 1, color: Colors.grey),
-            const SizedBox(height: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                for (int index = 0; index < cardItems.length; index++)
-                  Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            cardTitles[index],
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: cardItems[index].length,
-                          itemBuilder: (context, itemIndex) {
-                            final item = cardItems[index][itemIndex];
-                            return ListTile(
-                              title: Row(
-                                children: [
-                                  Expanded(
-                                    flex: 2,
-                                    child: Text(item['item']!),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Text(item['kbj']!, textAlign: TextAlign.center),
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: Checkbox(
-                                      value: itemChecklist[item['item']] ?? false,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          itemChecklist[item['item']!] = value!;
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: TextField(
-                            // controller: textEditingController,
-                            maxLines: null, // Allow multiple lines
-                            decoration: InputDecoration(
-                              labelText: 'Masukkan KBJ & Catatan / Temuan',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Card(
-                  elevation: 4,
-                  margin: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Text(
-                          'Catatan Penting',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 6, 
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(importantNotes[index]),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ElevatedButton(
-                        onPressed: submitData,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF304FFE),
-                          textStyle: const TextStyle(
-                            fontSize: 18,
-                          ),
-                          foregroundColor: Colors.white,
-                          elevation: 5,
-                        ),
-                        child: const Text('Submit'),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ],
         ),
@@ -415,7 +370,18 @@ class _p2hScreenState extends State<p2hBlScreen> {
     );
   }
 
+
   void _navigateBack(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/p2h');
+  }
+
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      controller.text = picked.format(context);
+    }
   }
 }

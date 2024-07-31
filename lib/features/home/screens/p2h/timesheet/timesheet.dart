@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/home/screens/p2h/excavator/postscript.dart';
+import 'package:myapp/features/home/screens/p2h/timesheet/postscript.dart';
+import '../../../services/p2h_services.dart';
 
 class TimesheetScreen extends StatefulWidget {
-  const TimesheetScreen({super.key});
+  final int locationId;
+
+  const TimesheetScreen({super.key, required this.locationId});
 
   @override
   _TimesheetScreenState createState() => _TimesheetScreenState();
@@ -10,7 +13,7 @@ class TimesheetScreen extends StatefulWidget {
 
 class _TimesheetScreenState extends State<TimesheetScreen> {
   // Controllers for input fields
-  // final TextEditingController timeController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
   final TextEditingController remarkController = TextEditingController();
 
   // List to store the input data
@@ -24,72 +27,71 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
   String? selectedKodeIdle;
   String? selectedKodeRepair;
 
-  final List<String> timeOptions = ['7:00', '8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '0:00', '1:00', '2:00', '3:00', '4:00', '5:00', '6:00'];
   final List<Map<String, String>> kodeAktivitasOptions = [
     {'code': 'A01', 'description': 'Pengeboran (Drilling)'},
-    {'code': 'A02', 'description': 'Peledakan (Blasting)'}, 
-    {'code': 'A03', 'description': 'Pemuatan (Loading)'}, 
-    {'code': 'A04', 'description': 'Pengangkutan (Hauling)'}, 
-    {'code': 'A05', 'description': 'Pembersihan Batu Bara (Cleaning)'}, 
-    {'code': 'A06', 'description': 'Ripping'}, 
-    {'code': 'A07', 'description': 'Dozing'}, 
-    {'code': 'A08', 'description': 'Penebaran (Spreading)'}, 
-    {'code': 'A09', 'description': 'General Pilar, Parit, Tanggul, Batubara'}, 
-    {'code': 'A10', 'description': 'Meratakan Jalan (Grading)'}, 
-    {'code': 'A11', 'description': 'Penyiraman (Spraying)'}, 
-    {'code': 'A12', 'description': 'Pemadatan (Compacting)'}, 
-    {'code': 'A13', 'description': 'Pengisian Fuel (Refueling)'}, 
-    {'code': 'A14', 'description': 'Pengangkatan (Lifting)'}, 
+    {'code': 'A02', 'description': 'Peledakan (Blasting)'},
+    {'code': 'A03', 'description': 'Pemuatan (Loading)'},
+    {'code': 'A04', 'description': 'Pengangkutan (Hauling)'},
+    {'code': 'A05', 'description': 'Pembersihan Batu Bara (Cleaning)'},
+    {'code': 'A06', 'description': 'Ripping'},
+    {'code': 'A07', 'description': 'Dozing'},
+    {'code': 'A08', 'description': 'Penebaran (Spreading)'},
+    {'code': 'A09', 'description': 'General Pilar, Parit, Tanggul, Batubara'},
+    {'code': 'A10', 'description': 'Meratakan Jalan (Grading)'},
+    {'code': 'A11', 'description': 'Penyiraman (Spraying)'},
+    {'code': 'A12', 'description': 'Pemadatan (Compacting)'},
+    {'code': 'A13', 'description': 'Pengisian Fuel (Refueling)'},
+    {'code': 'A14', 'description': 'Pengangkatan (Lifting)'},
     {'code': 'A15', 'description': 'Penarikan (Towing)'}
   ];
   final List<Map<String, String>> kodeMaterialOptions = [
-    {'code': 'OB', 'description': 'Tanah Buangan'}, 
-    {'code': 'CC', 'description': 'Batubara (Coal)'}, 
-    {'code': 'TS', 'description': 'Humus (Top Soil)'}, 
-    {'code': 'MD', 'description': 'Lumpur'}, 
-    {'code': 'DC', 'description': 'Batubara Kotor'}, 
+    {'code': 'OB', 'description': 'Tanah Buangan'},
+    {'code': 'CC', 'description': 'Batubara (Coal)'},
+    {'code': 'TS', 'description': 'Humus (Top Soil)'},
+    {'code': 'MD', 'description': 'Lumpur'},
+    {'code': 'DC', 'description': 'Batubara Kotor'},
     {'code': 'LOG', 'description': 'Kayu'}
   ];
   final List<Map<String, String>> kodeDelayOptions = [
-    {'code': 'D01', 'description': 'P2H'}, 
-    {'code': 'D02', 'description': 'P5M'}, 
-    {'code': 'D03', 'description': 'General Safety Talk'}, 
-    {'code': 'D04', 'description': 'Sholat'}, 
-    {'code': 'D05', 'description': 'Pengisian Solar (Refueling)'}, 
-    {'code': 'D06', 'description': 'Pemerniksaan Ban'}, 
-    {'code': 'D07', 'description': 'Pindah Lokasi'}, 
-    {'code': 'D08', 'description': 'Menunggu Alat Lain'}, 
-    {'code': 'D09', 'description': 'Menunggu Proses Survey'}, 
-    {'code': 'D10', 'description': 'Menunggu Blasting'}, 
-    {'code': 'D11', 'description': 'Mencuci Unit'}, 
-    {'code': 'D12', 'description': 'Istirahat Makan'}, 
-    {'code': 'D13', 'description': 'Tidak Ada Job'}, 
-    {'code': 'D14', 'description': 'Tidak Ada Operator'}, 
-    {'code': 'D15', 'description': 'Tukar Shift (Change Shift)'}, 
-    {'code': 'D16', 'description': 'Debu (Pandangan Terbatas)'}, 
-    {'code': 'D17', 'description': 'Perbaikan Fron / Jalan'}, 
-    {'code': 'D18', 'description': 'General Pilar'}, 
-    {'code': 'D19', 'description': 'Tidak Ada Material'}, 
-    {'code': 'D20', 'description': 'Fatique'}, 
+    {'code': 'D01', 'description': 'P2H'},
+    {'code': 'D02', 'description': 'P5M'},
+    {'code': 'D03', 'description': 'General Safety Talk'},
+    {'code': 'D04', 'description': 'Sholat'},
+    {'code': 'D05', 'description': 'Pengisian Solar (Refueling)'},
+    {'code': 'D06', 'description': 'Pemerniksaan Ban'},
+    {'code': 'D07', 'description': 'Pindah Lokasi'},
+    {'code': 'D08', 'description': 'Menunggu Alat Lain'},
+    {'code': 'D09', 'description': 'Menunggu Proses Survey'},
+    {'code': 'D10', 'description': 'Menunggu Blasting'},
+    {'code': 'D11', 'description': 'Mencuci Unit'},
+    {'code': 'D12', 'description': 'Istirahat Makan'},
+    {'code': 'D13', 'description': 'Tidak Ada Job'},
+    {'code': 'D14', 'description': 'Tidak Ada Operator'},
+    {'code': 'D15', 'description': 'Tukar Shift (Change Shift)'},
+    {'code': 'D16', 'description': 'Debu (Pandangan Terbatas)'},
+    {'code': 'D17', 'description': 'Perbaikan Fron / Jalan'},
+    {'code': 'D18', 'description': 'General Pilar'},
+    {'code': 'D19', 'description': 'Tidak Ada Material'},
+    {'code': 'D20', 'description': 'Fatique'},
     {'code': 'D21', 'description': 'Menunggu Penerangan (LT)'}
   ];
   final List<Map<String, String>> kodeIdleOptions = [
-    {'code': 'I01', 'description': 'Hujan (Rain)'}, 
-    {'code': 'I02', 'description': 'Jalan Licin (Slippery)'}, 
-    {'code': 'I03', 'description': 'Kabut'}, 
-    {'code': 'I04', 'description': 'Demo'}, 
-    {'code': 'I05', 'description': 'Customer Problem'}, 
+    {'code': 'I01', 'description': 'Hujan (Rain)'},
+    {'code': 'I02', 'description': 'Jalan Licin (Slippery)'},
+    {'code': 'I03', 'description': 'Kabut'},
+    {'code': 'I04', 'description': 'Demo'},
+    {'code': 'I05', 'description': 'Customer Problem'},
     {'code': 'I06', 'description': 'Libur'}
   ];
   final List<Map<String, String>> kodeRepairOptions = [
-    {'code': 'SCM', 'description': 'Schedule Service'}, 
-    {'code': 'USM', 'description': 'Unschedule Service'}, 
-    {'code': 'TRM', 'description': 'Perbaikan Tyre'}, 
+    {'code': 'SCM', 'description': 'Schedule Service'},
+    {'code': 'USM', 'description': 'Unschedule Service'},
+    {'code': 'TRM', 'description': 'Perbaikan Tyre'},
     {'code': 'ICM', 'description': 'Accident'}
   ];
 
   // Function to add input data to the list
-  void addData() {
+  void addData() async {
     setState(() {
       inputData.add({
         'Time': selectedTime ?? '',
@@ -101,8 +103,26 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
         'Kode Repair': selectedKodeRepair ?? '',
       });
 
+      final requestData = {
+        'timeTs': selectedTime,
+        'material': selectedKodeMaterial,
+        'remark': remarkController.text,
+        'activityCode': selectedKodeAktivitas,
+        'delayCode': selectedKodeDelay,
+        'idleCode': selectedKodeIdle,
+        'repairCode': selectedKodeRepair,
+      };
+
+      try {
+        final response = TimesheetServices().submitTimesheet(widget.locationId, requestData);
+        print('Submit response: $response');
+      } catch (e) {
+        print('Error submitting timesheet: $e');
+      }
+
       // Clear the input fields
       selectedTime = null;
+      timeController.clear();
       remarkController.clear();
       selectedKodeAktivitas = null;
       selectedKodeMaterial = null;
@@ -110,13 +130,13 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
       selectedKodeIdle = null;
       selectedKodeRepair = null;
     });
-    // Debugging: Print the current inputData
-    print(inputData);
   }
+
+
 
   // Function to navigate back to home
   void navigateBack(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/p2h');
   }
 
   Future<void> showCustomDropdown(
@@ -161,6 +181,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('Location ID: ${widget.locationId}');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Timesheet'),
@@ -193,10 +214,9 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: const Icon(Icons.notes),
             color: Colors.white,
             onPressed: () {
-              // Navigasi ke halaman edit ketika tombol "Edit" ditekan
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -212,29 +232,23 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // First row of input fields
             Row(
               children: [
                 Expanded(
-                  child: DropdownButtonFormField<String>(
+                  child: TextField(
+                    controller: timeController,
                     decoration: const InputDecoration(
                       labelText: 'Time',
                       border: OutlineInputBorder(),
+                      suffixIcon: Icon(Icons.access_time), // Add a time icon
                     ),
-                    value: selectedTime,
-                    items: timeOptions.map((String option) {
-                      return DropdownMenuItem<String>(
-                        value: option,
-                        child: Text(option),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedTime = newValue;
-                      });
-                    },
+                    style: const TextStyle(fontSize: 12),
+                    keyboardType: TextInputType.none,
+                    onTap: () => _selectTime(context, timeController),
+                    readOnly: true,
                   ),
                 ),
+
                 const SizedBox(width: 10),
                 Expanded(
                   child: GestureDetector(
@@ -243,7 +257,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                         context,
                         kodeMaterialOptions,
                         selectedKodeMaterial,
-                        (String? newValue) {
+                            (String? newValue) {
                           setState(() {
                             selectedKodeMaterial = newValue;
                           });
@@ -257,7 +271,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                         border: OutlineInputBorder(),
                       ),
                       child: Text(
-                        selectedKodeDelay != null
+                        selectedKodeMaterial != null
                             ? '${kodeMaterialOptions.firstWhere((option) => option['code'] == selectedKodeMaterial)['code']!} = ${kodeMaterialOptions.firstWhere((option) => option['code'] == selectedKodeMaterial)['description']!}'
                             : '',
                       ),
@@ -376,7 +390,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 10),
             // Dropdown for Kode Aktivitas
             GestureDetector(
@@ -454,4 +468,17 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
       ),
     );
   }
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedTime = picked.format(context);
+        controller.text = selectedTime!;
+      });
+    }
+  }
+
 }

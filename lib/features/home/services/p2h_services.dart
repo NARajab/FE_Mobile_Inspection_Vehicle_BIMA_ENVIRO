@@ -6,14 +6,13 @@ class P2hServices {
   final String baseUrl = dotenv.env['API_URL']!;
 
   Future<int> getAllP2hLength() async {
-    const String endpoint = '/p2h/all';
+    const String endpoint = '/p2h/length';
     final String apiUrl = '$baseUrl$endpoint';
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(response.body);
-        List<dynamic> p2hList = responseData['p2h'];
-        return p2hList.length;
+        return responseData['length'];
       } else {
         throw Exception('Failed to load data');
       }
@@ -59,10 +58,117 @@ class FormServices{
       body: jsonEncode(requestData),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       print('Data submitted successfully');
     } else {
       print('Failed to submit data');
+    }
+  }
+
+  Future<void> submitP2hBl(Map<String, dynamic> requestData, String token) async {
+    const String endpoint = '/p2h/bul';
+    final String apiUrl = '$baseUrl$endpoint';
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(requestData),
+    );
+
+    if (response.statusCode == 201) {
+      print('Data submitted successfully');
+    } else {
+      print('Failed to submit data');
+    }
+  }
+
+  Future<void> submitP2hLv(Map<String, dynamic> requestData, String token) async {
+     const String endpoint = '/p2h/lv';
+     final String apiUrl = '$baseUrl$endpoint';
+
+     final response = await http.post(
+       Uri.parse(apiUrl),
+       headers: {
+         'Content-Type': 'application/json',
+         'Authorization': 'Bearer $token'
+       },
+       body: jsonEncode(requestData)
+     );
+
+     if (response.statusCode == 201) {
+       print('Data submitted successfully');
+     } else {
+       print('Failed to submit data');
+     }
+  }
+
+  Future<void> submitP2hBs(Map<String, dynamic> requestData, String token) async {
+    const String endpoint = '/p2h/bus';
+    final String apiUrl = '$baseUrl$endpoint';
+
+    final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(requestData)
+    );
+
+    if (response.statusCode == 201) {
+      print('Data submitted successfully');
+    } else {
+      print('Failed to submit data');
+    }
+  }
+
+  Future<void> submitP2hEx(Map<String, dynamic> requestData, String token) async {
+     const String endpoint = '/p2h/ex';
+  }
+}
+
+class TimesheetServices {
+  final String baseUrl = dotenv.env['API_URL']!;
+
+  Future<Map<String, dynamic>> submitLocation(Map<String, dynamic> requestData, String token) async {
+    const String endpoint = '/p2h/location';
+    final String apiUrl = '$baseUrl$endpoint';
+
+    final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(requestData)
+    );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to submit data: ${response.reasonPhrase}');
+    }
+  }
+
+  Future<Map<String, dynamic>> submitTimesheet(int locationId, Map<String, dynamic> requestData) async {
+    const String endpoint = '/timesheet/';
+    final String apiUrl = '$baseUrl$endpoint$locationId';
+
+    final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestData)
+    );
+
+    if (response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to submit data: ${response.reasonPhrase}');
     }
   }
 }
