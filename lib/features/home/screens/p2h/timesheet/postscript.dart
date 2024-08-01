@@ -1,10 +1,43 @@
 import 'package:flutter/material.dart';
+import '../../../services/p2h_services.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class PostscriptScreen extends StatelessWidget {
+  final int locationId;
   final TextEditingController postscriptController = TextEditingController();
   final TextEditingController stopOperasiJamController = TextEditingController();
 
-  PostscriptScreen({super.key});
+  PostscriptScreen({super.key, required this.locationId});
+
+
+  void _submitData(BuildContext context) async {
+    final requestData = {
+      'postscript': postscriptController.text,
+      'stopOperation': stopOperasiJamController.text
+    };
+
+
+
+    try{
+      await TimesheetServices().submitPostscript(locationId, requestData);
+
+      Flushbar(
+        title: 'Success',
+        message: 'Data submitted successfully!',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.green,
+      ).show(context).then((_) {
+        _navigateBack(context);
+      });
+    }catch (e){
+      Flushbar(
+        title: 'Error',
+        message: 'Failed to submit data: $e',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+      ).show(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,11 +120,7 @@ class PostscriptScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Implement submit logic here
-                String postscript = postscriptController.text;
-                // Process or submit the postscript data as needed
-                print('Submitted postscript: $postscript');
-                // Example: Navigator.pop(context); // Navigate back or perform action
+                _submitData(context);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF304FFE),
@@ -107,6 +136,10 @@ class PostscriptScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _navigateBack(BuildContext context) {
+    Navigator.pop(context);
   }
 
   Future<void> _selectTime(BuildContext context, TextEditingController controller) async {

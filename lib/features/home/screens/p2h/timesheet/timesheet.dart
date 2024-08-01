@@ -12,14 +12,11 @@ class TimesheetScreen extends StatefulWidget {
 }
 
 class _TimesheetScreenState extends State<TimesheetScreen> {
-  // Controllers for input fields
   final TextEditingController timeController = TextEditingController();
   final TextEditingController remarkController = TextEditingController();
 
-  // List to store the input data
   List<Map<String, String>> inputData = [];
 
-  // Dropdown values
   String? selectedTime;
   String? selectedKodeAktivitas;
   String? selectedKodeMaterial;
@@ -181,7 +178,6 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('Location ID: ${widget.locationId}');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Timesheet'),
@@ -220,7 +216,7 @@ class _TimesheetScreenState extends State<TimesheetScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PostscriptScreen(),
+                  builder: (context) => PostscriptScreen(locationId: widget.locationId),
                 ),
               );
             },
