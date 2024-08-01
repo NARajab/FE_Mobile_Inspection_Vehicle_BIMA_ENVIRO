@@ -139,7 +139,6 @@ class _p2hScreenState extends State<p2hBlScreen> {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
-
     if (token != null) {
       FormServices formServices = FormServices();
       try {
@@ -218,7 +217,7 @@ class _p2hScreenState extends State<p2hBlScreen> {
                     Text(item['kbj'] ?? ''),
                     const SizedBox(width: 10),
                     Checkbox(
-                      value: itemChecklist[item['field']],
+                      value: itemChecklist[item['field']] ?? false,
                       onChanged: (value) {
                         setState(() {
                           itemChecklist[item['field'] ?? ''] = value ?? false;
