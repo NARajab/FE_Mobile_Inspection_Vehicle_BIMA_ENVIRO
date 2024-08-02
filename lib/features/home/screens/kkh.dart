@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:myapp/features/home/services/kkh_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KkhScreen extends StatefulWidget {
   const KkhScreen({super.key});
@@ -10,15 +12,15 @@ class KkhScreen extends StatefulWidget {
 }
 
 class _KkhScreenState extends State<KkhScreen> {
-  final TextEditingController jamTidurController = TextEditingController();
-  final TextEditingController jamBangunTidurController = TextEditingController();
+  final TextEditingController jamController = TextEditingController();
+  final TextEditingController menitController = TextEditingController();
   File? _image;
-
   final ImagePicker _picker = ImagePicker();
+  final KkhServices _kkhServices = KkhServices();
 
   void clearFields() {
-    jamTidurController.clear();
-    jamBangunTidurController.clear();
+    jamController.clear();
+    menitController.clear();
     setState(() {
       _image = null;
     });
@@ -33,19 +35,36 @@ class _KkhScreenState extends State<KkhScreen> {
     });
   }
 
-  void submitData() {
-    // final String jamTidur = jamTidurController.text;
-    // final String jamBangunTidur = jamBangunTidurController.text;
+  Future<void> submitData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
-    // Here you can add the logic to save the data
-    // For example, you can send it to a backend or save it locally
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Token not found. Please log in again.')),
+      );
+      return;
+    }
+    try {
+      String totalJamTidur = '${jamController.text} Jam ${menitController.text} Menit';
 
-    clearFields();
+      await _kkhServices.submitKkhData(
+        totalJamTidur,
+        _image,
+        token
+      );
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Data submitted successfully')),
-    );
+      clearFields();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data submitted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,17 +103,33 @@ class _KkhScreenState extends State<KkhScreen> {
           children: [
             const Text(
               'Masukkan jumlah jam tidur anda',
-              style: TextStyle(
-                  fontSize: 16
-              ),
+              style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 10,),
-            TextField(
-              controller: jamTidurController,
-              decoration: const InputDecoration(
-                labelText: 'Jumlah Jam Tidur',
-                border: OutlineInputBorder(),
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: jamController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Jam',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: menitController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Menit',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 15),
             ElevatedButton(
@@ -109,7 +144,7 @@ class _KkhScreenState extends State<KkhScreen> {
               height: 200,
               child: Image.file(
                 _image!,
-                fit: BoxFit.cover, // Ensures the image covers the container
+                fit: BoxFit.cover,
               ),
             ),
             const SizedBox(height: 10),
@@ -130,4 +165,5 @@ class _KkhScreenState extends State<KkhScreen> {
       ),
     );
   }
+
 }

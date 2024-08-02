@@ -1,5 +1,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class KkhServices {
@@ -38,6 +41,44 @@ class KkhServices {
       }
     } catch (e) {
       throw Exception('Error: $e');
+    }
+  }
+
+  Future<void> submitKkhData(String totalJamTidur, File? imageFile, String token) async {
+    const String endpoint = '/kkh/';
+    final String apiUrl = '$baseUrl$endpoint';
+    try {
+      final request = http.MultipartRequest('POST', Uri.parse(apiUrl));
+      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Content-Type'] = 'multipart/form-data';
+
+      if (imageFile != null) {
+        final imageStream = http.ByteStream(imageFile.openRead());
+        final length = await imageFile.length();
+        final mimeType = lookupMimeType(imageFile.path) ?? 'image/jpeg'; // Menentukan MIME type secara manual
+        final multipartFile = http.MultipartFile(
+          'imageUrl',
+          imageStream,
+          length,
+          filename: imageFile.path.split('/').last,
+          contentType: MediaType.parse(mimeType),
+        );
+        request.files.add(multipartFile);
+      }
+
+      request.fields['totaltime'] = totalJamTidur;
+
+      final response = await request.send();
+
+      if (response.statusCode == 201) {
+        final responseData = await response.stream.bytesToString();
+        final jsonResponse = json.decode(responseData);
+        print('Success: $jsonResponse');
+      } else {
+        print('Failed to submit data. Status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error: $e');
     }
   }
 }
