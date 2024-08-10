@@ -6,29 +6,31 @@ import '../../../history/screens/template/excavator_template.dart';
 import '../../../history/screens/template/light_vehicle_template.dart';
 
 class Foremanvalidationp2hScreen extends StatelessWidget{
+  final int p2hId;
   final String idVehicle;
   final String date;
   final String role;
 
   const Foremanvalidationp2hScreen({
     super.key,
+    required this.p2hId,
     required this.idVehicle,
     required this.date,
     required this.role
   });
 
-  Widget _buildTemplate(String idVehicle, String date, String entry, String role){
+  Widget _buildTemplate(int p2hId, String role){
     switch (idVehicle) {
       case 'Bulldozer':
-        return BulldozerTemplate(date: date, entry: entry, role: role);
+        return BulldozerTemplate(p2hId: p2hId, role: role);
       case 'Dump Truck':
-        return DumpTruckTemplate(date: date, entry: entry, role: role);
+        return DumpTruckTemplate(p2hId: p2hId, role: role);
       case 'Excavator':
-        return ExcavatorTemplate(date: date, entry: entry, role: role);
+        return ExcavatorTemplate(p2hId: p2hId);
       case 'Light Vehicle':
-        return LightVehicleTemplate(date: date, entry: entry, role: role);
+        return LightVehicleTemplate(p2hId: p2hId, role: role);
       case 'Sarana Bus':
-        return BusTemplate(date: date, entry: entry, role: role);
+        return BusTemplate(p2hId: p2hId, role: role);
       default:
         return Container();
     }
@@ -76,7 +78,7 @@ class Foremanvalidationp2hScreen extends StatelessWidget{
             'date': date,
             'entry': 'Example entry description'
           };
-          return _buildTemplate(idVehicle, date, entry['entry']!, 'foreman');
+          return _buildTemplate(p2hId, 'foreman');
         }
       ),
     );
