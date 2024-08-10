@@ -88,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ).show(context);
       }
     } catch (e) {
+      print("Exception occurred: $e");
       Flushbar(
         message: 'Exception: $e',
         duration: const Duration(seconds: 3),

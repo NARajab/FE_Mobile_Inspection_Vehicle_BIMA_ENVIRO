@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 
 class BulldozerTemplate extends StatelessWidget {
-  final String date;
-  final String entry;
+  final int p2hId;
   final String role;
   final bool isValidated;
 
   const BulldozerTemplate({
     super.key,
-    required this.date,
-    required this.entry,
+    required this.p2hId,
     required this.role,
     this.isValidated = false,
   });
@@ -34,7 +32,7 @@ class BulldozerTemplate extends StatelessWidget {
                 const SizedBox(height: 8),
                 _buildDetailRow('Model Unit', 'XYZ Model'),
                 _buildDetailRow('No Unit', '123'),
-                _buildDetailRow('Tanggal', date),
+                // _buildDetailRow('Tanggal', date),
                 _buildDetailRow('Shift', 'Pagi'),
                 _buildDetailRow('Nama Operator', 'John Doe'),
                 _buildDetailRow('Jam', '08:00 - 12:00'),

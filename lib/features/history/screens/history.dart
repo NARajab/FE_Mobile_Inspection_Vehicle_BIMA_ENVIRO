@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:myapp/features/history/screens/historyP2h.dart';
-import 'package:myapp/features/history/screens/historyKkh.dart';
+import 'package:myapp/features/history/screens/history_p2h.dart';
+import 'package:myapp/features/history/screens/history_kkh.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:myapp/features/history/services/p2h_services.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -14,14 +16,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String filterText = '';
   bool isSearching = false;
 
-  final List<Map<String, String>> p2hHistoryData = [
-    {'date': '01 April 2024 - Bulldozer', 'subtitle': 'Description for P2H item 1', 'isValidated': 'false'},
-    {'date': '02 April 2024 - Dump Truck', 'subtitle': 'Description for P2H item 2', 'isValidated': 'false'},
-    {'date': '01 April 2024 - Light Vehicle', 'subtitle': 'Description for P2H item 2', 'isValidated': 'true'},
-    {'date': '02 April 2024 - Sarana Bus', 'subtitle': 'Description for P2H item 2', 'isValidated': 'false'},
-    {'date': '02 April 2024 - Excavator', 'subtitle': 'Description for P2H item 2', 'isValidated': 'true'},
-  ];
-
+  List<Map<String, dynamic>> p2hHistoryData = [];
   final List<Map<String, String>> kkhHistoryData = [
     {
       'day': 'Monday',
@@ -39,8 +34,40 @@ class _HistoryScreenState extends State<HistoryScreen> {
       'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1715411463248._y3tmnY5j2.png?updatedAt=1715411473412',
       'isValidated': 'false'
     },
-    // Add more history items as needed
   ];
+
+  late P2hHistoryServices _p2hHistoryServices;
+
+  @override
+  void initState() {
+    super.initState();
+    _p2hHistoryServices = P2hHistoryServices();
+    _loadP2hHistoryData();
+  }
+
+  Future<void> _loadP2hHistoryData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      try {
+        final response = await _p2hHistoryServices.getAllP2h(token);
+
+        if (response['status'] == 'success' && response['p2h'] != null) {
+          setState(() {
+            p2hHistoryData = List<Map<String, dynamic>>.from(response['p2h']);
+          });
+        } else {
+          print('Failed to load P2h data or no data available.');
+        }
+      } catch (e) {
+        print('Error occurred while loading P2h history data: $e');
+      }
+    } else {
+      print('No token found, unable to load P2h history data.');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -98,26 +125,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildP2HTab() {
-    List<Map<String, String>> filteredData = p2hHistoryData.where((item) =>
-    item['date']!.toLowerCase().contains(filterText) ||
-        item['subtitle']!.toLowerCase().contains(filterText)
+    List<Map<String, dynamic>> filteredData = p2hHistoryData.where((item) =>
+    item['P2h']['date'] != null &&
+        item['P2h']['Vehicle']['type'] != null &&
+        item['P2h']['date']!.toLowerCase().contains(filterText.toLowerCase()) ||
+        item['P2h']['Vehicle']['type']!.toLowerCase().contains(filterText.toLowerCase())
     ).toList();
 
     // Sorting the filtered data
     filteredData.sort((a, b) {
-      // Parse the dates to DateTime objects
-      DateTime dateA = DateFormat('dd MMMM yyyy').parse(a['date']!);
-      DateTime dateB = DateFormat('dd MMMM yyyy').parse(b['date']!);
+      DateTime? dateA = DateTime.tryParse(a['P2h']['createdAt']);
+      DateTime? dateB = DateTime.tryParse(b['P2h']['createdAt']);
 
       // Compare dates first (newest first)
-      int dateComparison = dateB.compareTo(dateA);
+      int dateComparison = (dateB ?? DateTime.now()).compareTo(dateA ?? DateTime.now());
       if (dateComparison != 0) {
         return dateComparison;
       }
 
       // If dates are the same, compare isValidated (false first)
-      bool isValidatedA = a['isValidated'] == 'true';
-      bool isValidatedB = b['isValidated'] == 'true';
+      bool isValidatedA = a['dValidation'] == true;
+      bool isValidatedB = b['dValidation'] == true;
       return isValidatedA ? 1 : -1; // false (not validated) should come first
     });
 
@@ -146,13 +174,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             children: filteredData.map((item) => GestureDetector(
               onTap: () {
-                print('Navigating to HistoryP2hScreen with: ${item['date']}, ${item['subtitle']}, ${item['isValidated']}');
                 navigateToHistoryP2h(
                     context,
-                    item['date']!.split(' - ')[1],
-                    item['date']!.split(' - ')[0],
+                    item['P2h']['id'],
+                    item['P2h']['Vehicle']['type'],
+                    item['P2h']['date'],
                     'driver', // Assume role is 'driver' for now
-                    item['isValidated']!
+                    item['fValidation'].toString()
                 );
               },
               child: Card(
@@ -161,28 +189,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   title: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(item['date']!),
+                      Text('${item['P2h']['date']} - ${item['P2h']['Vehicle']['type']}'),
                       Container(
                         width: 10,
                         height: 10,
                         decoration: BoxDecoration(
-                          color: item['isValidated'] == 'true' ? Colors.green : Colors.red,
+                          color: item['fValidation'] == true ? Colors.green : Colors.red,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: item['isValidated'] == 'true'
+                              color: item['fValidation'] == true
                                   ? Colors.green.withOpacity(0.5)
                                   : Colors.red.withOpacity(0.5),
                               spreadRadius: 2,
                               blurRadius: 3,
-                              offset: const Offset(0, 1), // changes position of shadow
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  subtitle: Text(item['subtitle']!),
+                  subtitle: Text('Description'),
                 ),
               ),
             )).toList(),
@@ -191,6 +219,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       ],
     );
   }
+
 
   Widget _buildKKHTab() {
     List<Map<String, String>> filteredData = kkhHistoryData.where((item) =>
@@ -283,11 +312,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  void navigateToHistoryP2h(BuildContext context, String idVehicle, String date, String role, String isValidated) {
+  void navigateToHistoryP2h(BuildContext context,int p2hId, String idVehicle, String date, String role, String isValidated) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => HistoryP2hScreen(
+          p2hId: p2hId,
           idVehicle: idVehicle,
           date: date,
           role: role,

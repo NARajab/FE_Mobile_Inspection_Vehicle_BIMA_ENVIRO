@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../history/screens/historyKkh.dart';
+import '../../../history/screens/history_kkh.dart';
 
 class ForemanKkh extends StatefulWidget {
   const ForemanKkh({super.key});

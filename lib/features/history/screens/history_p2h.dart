@@ -4,8 +4,10 @@ import 'package:myapp/features/history/screens/template/bus_template.dart';
 import 'package:myapp/features/history/screens/template/dump_truck_template.dart';
 import 'package:myapp/features/history/screens/template/excavator_template.dart';
 import 'package:myapp/features/history/screens/template/light_vehicle_template.dart';
+import 'package:myapp/features/history/screens/notes_screen.dart';
 
 class HistoryP2hScreen extends StatelessWidget {
+  final int p2hId;
   final String idVehicle;
   final String date;
   final String role;
@@ -13,24 +15,25 @@ class HistoryP2hScreen extends StatelessWidget {
 
   const HistoryP2hScreen({
     super.key,
+    required this.p2hId,
     required this.idVehicle,
     required this.date,
     required this.role,
     required this.isValidated
   });
 
-  Widget _buildTemplate(String idVehicle, String date, String entry) {
+  Widget _buildTemplate(int p2hId, String idVehicle, String date, String entry) {
     switch (idVehicle) {
       case 'Bulldozer':
-        return BulldozerTemplate(date: date, entry: entry, role: role);
+        return BulldozerTemplate(p2hId: p2hId, role: role);
       case 'Dump Truck':
-        return DumpTruckTemplate(date: date, entry: entry, role: role);
+        return DumpTruckTemplate(p2hId: p2hId, role: role);
       case 'Excavator':
-        return ExcavatorTemplate(date: date, entry: entry, role: role);
+        return ExcavatorTemplate(p2hId: p2hId);
       case 'Light Vehicle':
-        return LightVehicleTemplate(date: date, entry: entry, role: role);
+        return LightVehicleTemplate(p2hId: p2hId, role: role);
       case 'Sarana Bus':
-        return BusTemplate(date: date, entry: entry, role: role);
+        return BusTemplate(p2hId: p2hId, role: role);
       default:
         return Container();
     }
@@ -68,7 +71,22 @@ class HistoryP2hScreen extends StatelessWidget {
             ),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notes),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NoteScreen(p2hId: p2hId),
+                ),
+              );
+            },
+          ),
+        ],
       ),
+
       body: ListView.builder(
         itemCount: 1, // Just one entry based on your example
         itemBuilder: (context, index) {
@@ -79,7 +97,7 @@ class HistoryP2hScreen extends StatelessWidget {
             'role': role
           };
 
-          return _buildTemplate(idVehicle, date, entry['entry']!);
+          return _buildTemplate(p2hId, idVehicle, date, entry['entry']!);
         },
       ),
     );

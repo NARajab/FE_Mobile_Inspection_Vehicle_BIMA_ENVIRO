@@ -15,38 +15,66 @@ class p2hExScreen extends StatefulWidget {
 class _p2hScreenState extends State<p2hExScreen> {
   List<List<Map<String, String>>> cardItems = [
     [
-      {'item': 'Kondisi Underacarriage', 'field': 'ku', 'kbj' : 'A'},
+      {'item': 'Kondisi Underacarriage', 'field': 'ku', 'kbj': 'A'},
       {'item': 'Kerusakan akibat insiden ***)', 'field': 'kai', 'kbj': 'AA'},
-      {'item': 'Kebocoran oli gear box / oli PTO', 'field': 'kogb', 'kbj': 'AA'},
-      {'item': 'Level oli swing & kebocoran', 'field': 'los', 'kbj' : 'AA'},
+      {
+        'item': 'Kebocoran oli gear box / oli PTO',
+        'field': 'kogb',
+        'kbj': 'AA'
+      },
+      {'item': 'Level oli swing & kebocoran', 'field': 'los', 'kbj': 'AA'},
       {'item': 'Level oli hydraulic & kebocoran', 'field': 'loh', 'kbj': 'AA'},
-      {'item': 'Fuel drain / Buangan air dari tanki BBC', 'field': 'fd', 'kbj': 'A'},
-      {'item': 'BBC minimum 25% dari Cap. Tangki', 'field': 'bbcmin', 'kbj' : 'A'},
-      {'item': 'Buang air dalam tanki udara', 'field': 'badtu', 'kbj' : 'A'},
-      {'item': 'Kebersihan accessories safety & Alat', 'field': 'kasa', 'kbj': 'A'},
-      {'item': 'Kebocoran2 bila ada (oli, solar, grease)', 'field': 'kba', 'kbj': 'A'},
-      {'item': 'Back travel (Big Digger)', 'field': 'at', 'kbj' : 'A'},
-      {'item': 'Lock pin Bucket', 'field': 'lpb', 'kbj' : 'AA'},
-      {'item': 'Lock pin tooth & ketajaman kuku', 'field': 'lptdkk', 'kbj' : 'AA'},
-      {'item': 'Kebersihan aki / battery', 'field': 'ka', 'kbj' : 'A'}
+      {
+        'item': 'Fuel drain / Buangan air dari tanki BBC',
+        'field': 'fd',
+        'kbj': 'A'
+      },
+      {
+        'item': 'BBC minimum 25% dari Cap. Tangki',
+        'field': 'bbcmin',
+        'kbj': 'A'
+      },
+      {'item': 'Buang air dalam tanki udara', 'field': 'badtu', 'kbj': 'A'},
+      {
+        'item': 'Kebersihan accessories safety & Alat',
+        'field': 'kasa',
+        'kbj': 'A'
+      },
+      {
+        'item': 'Kebocoran2 bila ada (oli, solar, grease)',
+        'field': 'kba',
+        'kbj': 'A'
+      },
+      {'item': 'Back travel (Big Digger)', 'field': 'at', 'kbj': 'A'},
+      {'item': 'Lock pin Bucket', 'field': 'lpb', 'kbj': 'AA'},
+      {
+        'item': 'Lock pin tooth & ketajaman kuku',
+        'field': 'lptdkk',
+        'kbj': 'AA'
+      },
+      {'item': 'Kebersihan aki / battery', 'field': 'ka', 'kbj': 'A'}
     ],
     [
-      {'item':'Air conditioner (AC)', 'field': 'ac', 'kbj': 'A'},
-      {'item':'Fungsi steering / kemudi', 'field': 'fs', 'kbj':'AA'},
-      {'item':'Fungsi seat belt / sabuk pengaman', 'field': 'fsb', 'kbj':'AA'},
-      {'item':'Fungsi semua lampu', 'field': 'fsl', 'kbj': 'AA'},
-      {'item':'Fungsi Rotary lamp', 'field': 'frl', 'kbj':'AA'},
-      {'item':'Fungsi mirror / spion', 'field': 'fm', 'kbj': 'A'},
-      {'item':'Fungsi wiper dan air wiper', 'field': 'fwdaw', 'kbj': 'A'},
-      {'item':'Fungsi horn / klakson', 'field': 'fh', 'kbj': 'AA'},
-      {'item':'Fire Extinguiser / APAR', 'field': 'feapar', 'kbj': 'AA'},
-      {'item':'Fungsi kontrol panel', 'field': 'fkp', 'kbj': 'AA'},
-      {'item':'Fungsi radio komunikasi', 'field': 'frk', 'kbj': 'AA'},
-      {'item':'Kebersihan ruang kabin', 'field': 'krb', 'kbj': 'A'},
+      {'item': 'Air conditioner (AC)', 'field': 'ac', 'kbj': 'A'},
+      {'item': 'Fungsi steering / kemudi', 'field': 'fs', 'kbj': 'AA'},
+      {
+        'item': 'Fungsi seat belt / sabuk pengaman',
+        'field': 'fsb',
+        'kbj': 'AA'
+      },
+      {'item': 'Fungsi semua lampu', 'field': 'fsl', 'kbj': 'AA'},
+      {'item': 'Fungsi Rotary lamp', 'field': 'frl', 'kbj': 'AA'},
+      {'item': 'Fungsi mirror / spion', 'field': 'fm', 'kbj': 'A'},
+      {'item': 'Fungsi wiper dan air wiper', 'field': 'fwdaw', 'kbj': 'A'},
+      {'item': 'Fungsi horn / klakson', 'field': 'fh', 'kbj': 'AA'},
+      {'item': 'Fire Extinguiser / APAR', 'field': 'feapar', 'kbj': 'AA'},
+      {'item': 'Fungsi kontrol panel', 'field': 'fkp', 'kbj': 'AA'},
+      {'item': 'Fungsi radio komunikasi', 'field': 'frk', 'kbj': 'AA'},
+      {'item': 'Kebersihan ruang kabin', 'field': 'krk', 'kbj': 'A'},
     ],
     [
-      {'item':'Air Radiator', 'field': 'ar', 'kbj': 'AA'},
-      {'item':'Oil Engine / Oli Mesin', 'field': 'oe', 'kbj': 'AA'},
+      {'item': 'Air Radiator', 'field': 'ar', 'kbj': 'AA'},
+      {'item': 'Oil Engine / Oli Mesin', 'field': 'oe', 'kbj': 'AA'},
     ],
   ];
 
@@ -154,7 +182,6 @@ class _p2hScreenState extends State<p2hExScreen> {
         shiftController.clear();
         hmAwalController.clear();
         hmAkhirController.clear();
-
       } catch (error) {
         Flushbar(
           title: 'Error',
@@ -173,12 +200,9 @@ class _p2hScreenState extends State<p2hExScreen> {
     }
   }
 
-  Widget _buildTextField(
-      TextEditingController controller,
-      String labelText, {
-        TextInputType keyboardType = TextInputType.text,
-        GestureTapCallback? onTap
-      }) {
+  Widget _buildTextField(TextEditingController controller, String labelText,
+      {TextInputType keyboardType = TextInputType.text,
+      GestureTapCallback? onTap}) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
@@ -355,12 +379,12 @@ class _p2hScreenState extends State<p2hExScreen> {
     );
   }
 
-
   void _navigateBack(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/p2h');
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(
+      BuildContext context, TextEditingController controller) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),

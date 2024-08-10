@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:myapp/features/home/screens/forman/foremanValidationP2h.dart';
+import 'package:myapp/features/home/screens/forman/foreman_validation_p2h.dart';
 
 class ForemanP2h extends StatefulWidget {
   const ForemanP2h({super.key});
@@ -114,6 +114,7 @@ class _ForemanP2hState extends State<ForemanP2h> {
         children: filteredData
             .map((item) => _buildCard(
           context,
+          item['id']!,
           item['title']!,
           item['subtitle']!,
           item['idVehicle']!,
@@ -126,10 +127,10 @@ class _ForemanP2hState extends State<ForemanP2h> {
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, String subtitle, String idVehicle, String date, String role, bool isValidated) {
+  Widget _buildCard(BuildContext context, int p2hId, String title, String subtitle, String idVehicle, String date, String role, bool isValidated) {
     return GestureDetector(
       onTap: () {
-        navigateToForemanValidationP2h(context, idVehicle, date, role);
+        navigateToForemanValidationP2h(context, p2hId, idVehicle, date, role);
       },
       child: Card(
         elevation: 3,
@@ -163,11 +164,11 @@ class _ForemanP2hState extends State<ForemanP2h> {
   }
 }
 
-void navigateToForemanValidationP2h(BuildContext context, String idVehicle, String date, String role) {
+void navigateToForemanValidationP2h(BuildContext context, int p2hId, String idVehicle, String date, String role) {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => Foremanvalidationp2hScreen(idVehicle: idVehicle, date: date, role: role),
+      builder: (context) => Foremanvalidationp2hScreen(p2hId: p2hId,idVehicle: idVehicle, date: date, role: role),
     ),
   );
 }

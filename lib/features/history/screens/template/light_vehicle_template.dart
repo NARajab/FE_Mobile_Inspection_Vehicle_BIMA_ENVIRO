@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 
 class LightVehicleTemplate extends StatelessWidget {
-  final String date;
-  final String entry;
+  final int p2hId;
   final String role;
 
   const LightVehicleTemplate({
     super.key,
-    required this.date,
-    required this.entry,
+    required this.p2hId,
     required this.role
   });
 
@@ -32,7 +30,7 @@ class LightVehicleTemplate extends StatelessWidget {
                 const SizedBox(height: 8),
                 _buildDetailRow('Model Unit', 'XYZ Model'),
                 _buildDetailRow('No Unit', '123'),
-                _buildDetailRow('Tanggal', date),
+                _buildDetailRow('Tanggal', '123'),
                 _buildDetailRow('Shift', 'Pagi'),
                 _buildDetailRow('Nama Driver', 'John Doe'),
                 _buildDetailRow('Jam', '08:00 - 12:00'),
