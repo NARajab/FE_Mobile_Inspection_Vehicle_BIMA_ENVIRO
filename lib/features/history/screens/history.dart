@@ -15,6 +15,7 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   String filterText = '';
   bool isSearching = false;
+  bool isLoading = true;
 
   List<Map<String, dynamic>> p2hHistoryData = [];
   final List<Map<String, String>> kkhHistoryData = [
@@ -56,15 +57,25 @@ class _HistoryScreenState extends State<HistoryScreen> {
         if (response['status'] == 'success' && response['p2h'] != null) {
           setState(() {
             p2hHistoryData = List<Map<String, dynamic>>.from(response['p2h']);
+            isLoading = false; // Set isLoading menjadi false setelah data dimuat
           });
         } else {
           print('Failed to load P2h data or no data available.');
+          setState(() {
+            isLoading = false; // Set isLoading menjadi false jika data tidak tersedia
+          });
         }
       } catch (e) {
         print('Error occurred while loading P2h history data: $e');
+        setState(() {
+          isLoading = false; // Set isLoading menjadi false jika terjadi error
+        });
       }
     } else {
       print('No token found, unable to load P2h history data.');
+      setState(() {
+        isLoading = false; // Set isLoading menjadi false jika token tidak ditemukan
+      });
     }
   }
 
@@ -110,7 +121,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ],
             ),
           ),
-          body: Container(
+          body: isLoading // Check apakah masih loading
+              ? const Center(child: CircularProgressIndicator()) // Tampilkan indikator loading
+              : Container(
             color: Colors.white,
             child: TabBarView(
               children: [

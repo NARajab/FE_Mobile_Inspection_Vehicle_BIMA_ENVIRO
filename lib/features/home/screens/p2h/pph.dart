@@ -7,7 +7,7 @@ import 'pph_lv.dart';
 import 'pph_ex.dart';
 import '../homepage.dart';
 
-class p2hScreen extends StatelessWidget {
+class P2hScreen extends StatelessWidget {
   final List<Map<String, dynamic>> items = [
     {
       'id': 1,
@@ -46,7 +46,7 @@ class p2hScreen extends StatelessWidget {
     },
   ];
 
-  p2hScreen({super.key});
+  P2hScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -148,15 +148,15 @@ class p2hScreen extends StatelessWidget {
   Widget _getNextScreen(String route, int id) {
     switch (route) {
       case '/blForm':
-        return p2hBlScreen(id: id);
+        return P2hBlScreen(id: id);
       case '/dtForm':
-        return p2hDtScreen(id: id);
+        return P2hDtScreen(id: id);
       case '/exForm':
-        return p2hExScreen(id: id);
+        return P2hExScreen(id: id);
       case '/lvForm':
-        return p2hLvScreen(id: id);
+        return P2hLvScreen(id: id);
       case '/bsForm':
-        return p2hBsScreen(id: id);
+        return P2hBsScreen(id: id);
       case '/location':
         return const LocationScreen();
       default:

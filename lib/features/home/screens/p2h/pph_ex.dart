@@ -3,16 +3,16 @@ import '../../services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:another_flushbar/flushbar.dart';
 
-class p2hExScreen extends StatefulWidget {
+class P2hExScreen extends StatefulWidget {
   final int id;
 
-  const p2hExScreen({super.key, required this.id});
+  const P2hExScreen({super.key, required this.id});
 
   @override
-  _p2hScreenState createState() => _p2hScreenState();
+  P2hExScreenState createState() => P2hExScreenState();
 }
 
-class _p2hScreenState extends State<p2hExScreen> {
+class P2hExScreenState extends State<P2hExScreen> {
   List<List<Map<String, String>>> cardItems = [
     [
       {'item': 'Kondisi Underacarriage', 'field': 'ku', 'kbj': 'A'},
