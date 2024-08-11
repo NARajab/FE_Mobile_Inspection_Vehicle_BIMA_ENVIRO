@@ -3,16 +3,16 @@ import '../../services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:another_flushbar/flushbar.dart';
 
-class p2hBlScreen extends StatefulWidget {
+class P2hBlScreen extends StatefulWidget {
   final int id;
 
-  const p2hBlScreen({super.key, required this.id});
+  const P2hBlScreen({super.key, required this.id});
 
   @override
-  _p2hScreenState createState() => _p2hScreenState();
+  _P2hScreenState createState() => _P2hScreenState();
 }
 
-class _p2hScreenState extends State<p2hBlScreen> {
+class _P2hScreenState extends State<P2hBlScreen> {
   List<List<Map<String, String>>> cardItems = [
     [
       {'item': 'Kondisi Underacarriage', 'field': 'ku', 'kbj' : 'A'},
@@ -35,7 +35,7 @@ class _p2hScreenState extends State<p2hBlScreen> {
       {'item':'Fungsi semua lampu', 'field': 'fsl', 'kbj': 'AA'},
       {'item':'Fungsi Rotary lamp', 'field': 'frl', 'kbj':'AA'},
       {'item':'Fungsi mirror / spion', 'field': 'fm', 'kbj': 'A'},
-      {'item':'Fungsi wiper dan air wiper', 'field': 'fwadaw', 'kbj': 'A'},
+      {'item':'Fungsi wiper dan air wiper', 'field': 'fwdaw', 'kbj': 'A'},
       {'item':'Fungsi kontrol panel', 'field': 'fkp', 'kbj': 'AA'},
       {'item':'Fungsi horn / klakson', 'field': 'fh', 'kbj': 'AA'},
       {'item':'Fire Extinguiser / APAR', 'field': 'feapar', 'kbj': 'AA'},

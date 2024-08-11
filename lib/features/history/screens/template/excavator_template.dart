@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:myapp/features/history/services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,6 +41,15 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
     }
 
     return 'Unknown';
+  }
+
+  void _showFlushbar(BuildContext context) {
+    Flushbar(
+      message: "Timesheet tidak ditemukan",
+      duration: const Duration(seconds: 3),
+      backgroundColor: Colors.red,
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(context);
   }
 
   @override
@@ -207,12 +217,23 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
                           ElevatedButton(
                             onPressed: () {
                               var idLocation = pph['idLocation'];
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TimesheetTemplate(idLocation: idLocation),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => TimesheetTemplate(idLocation: idLocation),
+                              //   ),
+                              // );
+                              if (idLocation != null) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        TimesheetTemplate(idLocation: idLocation),
+                                  ),
+                                );
+                              } else {
+                                _showFlushbar(context);
+                              }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF304FFE),

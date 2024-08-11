@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/features/history/services/p2h_services.dart'; // Update the import path
+import 'package:myapp/features/history/services/p2h_services.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class TimesheetTemplate extends StatefulWidget {
@@ -25,7 +25,7 @@ class _TimesheetTemplateState extends State<TimesheetTemplate> {
   Future<Map<String, dynamic>> fetchTimesheetData() async {
     try {
       P2hHistoryServices service = P2hHistoryServices();
-      final response = await service.getTimesheet(13);
+      final response = await service.getTimesheet(widget.idLocation);
 
       if (response['status'] == 'success') {
         setState(() {

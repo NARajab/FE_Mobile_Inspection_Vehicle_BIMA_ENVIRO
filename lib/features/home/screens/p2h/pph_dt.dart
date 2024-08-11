@@ -3,16 +3,16 @@ import '../../services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:another_flushbar/flushbar.dart';
 
-class p2hDtScreen extends StatefulWidget {
+class P2hDtScreen extends StatefulWidget {
   final int id;
 
-  const p2hDtScreen({super.key, required this.id});
+  const P2hDtScreen({super.key, required this.id});
 
   @override
-  _p2hScreenState createState() => _p2hScreenState();
+  P2hDtScreenState createState() => P2hDtScreenState();
 }
 
-class _p2hScreenState extends State<p2hDtScreen> {
+class P2hDtScreenState extends State<P2hDtScreen> {
   List<List<Map<String, String>>> cardItems = [
     [
       {'item': 'Ban & Baut roda', 'field': 'bdbr', 'kbj': 'AA'},
@@ -73,6 +73,7 @@ class _p2hScreenState extends State<p2hDtScreen> {
   TextEditingController modelUnitController = TextEditingController();
   TextEditingController nomorUnitController = TextEditingController();
   TextEditingController shiftController = TextEditingController();
+  TextEditingController timeController = TextEditingController();
   TextEditingController hmAwalController = TextEditingController();
   TextEditingController hmAkhirController = TextEditingController();
   TextEditingController kmAwalController = TextEditingController();
@@ -125,6 +126,7 @@ class _p2hScreenState extends State<p2hDtScreen> {
       'modelu': modelUnitController.text.trim(),
       'nou': nomorUnitController.text.trim(),
       'shift': shiftController.text.trim(),
+      'time': timeController.text.trim(),
       'earlyhm': hmAwalController.text.trim(),
       'endhm': hmAkhirController.text.trim(),
       'earlykm': kmAwalController.text.trim(),
@@ -166,6 +168,7 @@ class _p2hScreenState extends State<p2hDtScreen> {
         aroundUnitNotesController.clear();
         inTheCabinNotesController.clear();
         machineRoomNotesController.clear();
+        timeController.clear();
         itemChecklist.updateAll((key, value) => false);
 
       } catch (error) {
@@ -192,6 +195,7 @@ class _p2hScreenState extends State<p2hDtScreen> {
       TextEditingController controller,
       String labelText, {
         TextInputType keyboardType = TextInputType.text,
+        GestureTapCallback? onTap
       }) {
     return TextField(
       controller: controller,
@@ -199,6 +203,8 @@ class _p2hScreenState extends State<p2hDtScreen> {
         labelText: labelText,
       ),
       keyboardType: keyboardType,
+      onTap: onTap,
+      readOnly: false,
     );
   }
 
@@ -309,6 +315,11 @@ class _p2hScreenState extends State<p2hDtScreen> {
             _buildTextField(modelUnitController, 'Model Unit'),
             _buildTextField(nomorUnitController, 'Nomor Unit'),
             _buildTextField(shiftController, 'Shift'),
+            _buildTextField(
+              timeController,
+              'Jam',
+              onTap: () => _selectTime(context, timeController),
+            ),
             _buildTextField(hmAwalController, 'HM Awal', keyboardType: TextInputType.number),
             _buildTextField(hmAkhirController, 'HM Akhir', keyboardType: TextInputType.number),
             _buildTextField(kmAwalController, 'KM Awal', keyboardType: TextInputType.number),
@@ -352,5 +363,15 @@ class _p2hScreenState extends State<p2hDtScreen> {
 
   void _navigateBack(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/p2h');
+  }
+
+  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      controller.text = picked.format(context);
+    }
   }
 }

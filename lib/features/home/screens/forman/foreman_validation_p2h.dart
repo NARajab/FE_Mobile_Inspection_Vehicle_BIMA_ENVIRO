@@ -22,15 +22,15 @@ class Foremanvalidationp2hScreen extends StatelessWidget{
   Widget _buildTemplate(int p2hId, String role){
     switch (idVehicle) {
       case 'Bulldozer':
-        return BulldozerTemplate(p2hId: p2hId, role: role);
+        return BulldozerTemplate(p2hId: p2hId);
       case 'Dump Truck':
-        return DumpTruckTemplate(p2hId: p2hId, role: role);
+        return DumpTruckTemplate(p2hId: p2hId);
       case 'Excavator':
         return ExcavatorTemplate(p2hId: p2hId);
       case 'Light Vehicle':
-        return LightVehicleTemplate(p2hId: p2hId, role: role);
+        return LightVehicleTemplate(p2hId: p2hId);
       case 'Sarana Bus':
-        return BusTemplate(p2hId: p2hId, role: role);
+        return BusTemplate(p2hId: p2hId);
       default:
         return Container();
     }
