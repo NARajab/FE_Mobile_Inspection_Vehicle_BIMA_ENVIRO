@@ -4,6 +4,7 @@ import 'package:myapp/features/history/screens/history_p2h.dart';
 import 'package:myapp/features/history/screens/history_kkh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/features/history/services/p2h_services.dart';
+import 'package:myapp/features/history/services/kkh_services.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -18,32 +19,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool isLoading = true;
 
   List<Map<String, dynamic>> p2hHistoryData = [];
-  final List<Map<String, String>> kkhHistoryData = [
-    {
-      'day': 'Monday',
-      'date': '10 January 2024',
-      'subtitle': 'Fit to work',
-      'totalJamTidur': '9h 10m',
-      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1715870568918._KGSHwcx2a.jpg?updatedAt=1715870572864',
-      'isValidated': 'true'
-    },
-    {
-      'day': 'Tuesday',
-      'date': '11 January 2024',
-      'subtitle': 'Sakit Kepala',
-      'totalJamTidur': '6h 10m',
-      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1715411463248._y3tmnY5j2.png?updatedAt=1715411473412',
-      'isValidated': 'false'
-    },
-  ];
+  List<Map<String, dynamic>> kkhHistoryData = [];
 
   late P2hHistoryServices _p2hHistoryServices;
+  late KkhHistoryServices _kkhHistoryServices;
 
   @override
   void initState() {
     super.initState();
     _p2hHistoryServices = P2hHistoryServices();
+    _kkhHistoryServices = KkhHistoryServices();
     _loadP2hHistoryData();
+    _loadKkhHistoryData();
   }
 
   Future<void> _loadP2hHistoryData() async {
@@ -73,6 +60,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }
     } else {
       print('No token found, unable to load P2h history data.');
+      setState(() {
+        isLoading = false; // Set isLoading menjadi false jika token tidak ditemukan
+      });
+    }
+  }
+
+  Future<void> _loadKkhHistoryData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      try {
+        final response = await _kkhHistoryServices.getAllKkh(token);
+
+        if (response['status'] == 'success' && response['kkh'] != null) {
+          setState(() {
+            kkhHistoryData = List<Map<String, dynamic>>.from(response['kkh']);
+            isLoading = false; // Set isLoading menjadi false setelah data dimuat
+          });
+        } else {
+          print('Failed to load P2h data or no data available.');
+          setState(() {
+            isLoading = false; // Set isLoading menjadi false jika data tidak tersedia
+          });
+        }
+      } catch (e) {
+        print('Error occurred while loading Kkh history data: $e');
+        setState(() {
+          isLoading = false; // Set isLoading menjadi false jika terjadi error
+        });
+      }
+    } else {
+      print('No token found, unable to load Kkh history data.');
       setState(() {
         isLoading = false; // Set isLoading menjadi false jika token tidak ditemukan
       });
@@ -128,7 +148,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             child: TabBarView(
               children: [
                 _buildP2HTab(),
-                _buildKKHTab(),
+                _buildKKHTab(kkhHistoryData),
               ],
             ),
           ),
@@ -223,7 +243,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       ),
                     ],
                   ),
-                  subtitle: Text('Description'),
+                  subtitle: const Text('Description'),
                 ),
               ),
             )).toList(),
@@ -234,18 +254,27 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
 
-  Widget _buildKKHTab() {
-    List<Map<String, String>> filteredData = kkhHistoryData.where((item) =>
-    item['day']!.toLowerCase().contains(filterText) ||
-        item['date']!.toLowerCase().contains(filterText) ||
-        (item['subtitle'] != null && item['subtitle']!.toLowerCase().contains(filterText))
-    ).toList();
+  Widget _buildKKHTab(List<Map<String, dynamic>> kkhData) {
+    List<Map<String, dynamic>> filteredData = kkhData.where((item) {
+      String createdAt = item['createdAt'] ?? '';
+      return createdAt.toLowerCase().contains(filterText);
+    }).toList();
 
-    // Sort data berdasarkan tanggal 'day'
+    // Sort data based on 'createdAt'
     filteredData.sort((a, b) {
-      DateTime dateA = DateFormat('dd MMMM yyyy').parse(a['date']!);
-      DateTime dateB = DateFormat('dd MMMM yyyy').parse(b['date']!);
-      return dateB.compareTo(dateA); // descending order, use dateA.compareTo(dateB) for ascending
+      DateTime? dateA;
+      DateTime? dateB;
+
+      try {
+        // Assuming 'createdAt' is in a known format, e.g., 'yyyy-MM-ddTHH:mm:ss'
+        dateA = DateTime.tryParse(a['createdAt']);
+        dateB = DateTime.tryParse(b['createdAt']);
+      } catch (e) {
+        print('Error parsing date: $e');
+      }
+
+      // Compare dates first (newest first)
+      return (dateB ?? DateTime.now()).compareTo(dateA ?? DateTime.now());
     });
 
     return Column(
@@ -271,59 +300,85 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ? const Center(child: Text('No results found'))
               : ListView(
             padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            children: filteredData.map((historyItem) => GestureDetector(
-              onTap: () {
-                navigateToHistoryKkh(
+            children: filteredData.map((historyItem) {
+              String formattedDate = DateFormat('EEEE, dd MMMM yyyy', 'id').format(DateTime.parse(historyItem['createdAt']));
+              Color statusColor;
+              switch (historyItem['complaint']) {
+                case 'Fit to work':
+                  statusColor = Colors.green;
+                  break;
+                case 'On Monitoring':
+                  statusColor = Colors.orange;
+                  break;
+                case 'Kurang Tidur':
+                  statusColor = Colors.red;
+                  break;
+                default:
+                  statusColor = Colors.black; // Default color
+              }
+              return GestureDetector(
+                onTap: () {
+                  navigateToHistoryKkh(
                     context,
-                    historyItem['day']!,
-                    historyItem['date']!,
-                    historyItem['subtitle']!,
-                    historyItem['totalJamTidur']!,
-                    historyItem['imageUrl']!,
-                    historyItem['isValidated']!
-                );
-              },
-              child: Card(
-                elevation: 3,
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(historyItem['imageUrl']!),
-                  ),
-                  title: Text('${historyItem['day']!}, ${historyItem['date']!}'),
-                  subtitle: Text(historyItem['subtitle']!),
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: historyItem['isValidated'] == 'true' ? Colors.green : Colors.red,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: historyItem['isValidated'] == 'true'
-                                  ? Colors.green.withOpacity(0.5)
-                                  : Colors.red.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 3,
-                              offset: const Offset(0, 1), // changes position of shadow
-                            ),
-                          ],
+                    formattedDate,
+                    historyItem['date'],
+                    historyItem['complaint'],
+                    historyItem['totaltime'],
+                    historyItem['imageUrl'],
+                    historyItem['wValidation'].toString(),
+                  );
+                },
+                child: Card(
+                  elevation: 3,
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundImage: NetworkImage(historyItem['imageUrl']),
+                    ),
+                    title: Text(
+                        formattedDate,
+                        style: const TextStyle(
+                          fontSize: 14
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(historyItem['totalJamTidur']!),
-                    ],
+                    ),
+                    subtitle: Text(
+                      historyItem['complaint'] ?? '',
+                      style: TextStyle(color: statusColor),
+                    ),
+                    trailing: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: historyItem['fValidation'] ? Colors.green : Colors.red,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: historyItem['fValidation']
+                                    ? Colors.green.withOpacity(0.5)
+                                    : Colors.red.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 3,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(historyItem['totaltime']),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )).toList(),
+              );
+            }).toList(),
           ),
         ),
       ],
     );
   }
+
 
   void navigateToHistoryP2h(BuildContext context,int p2hId, String idVehicle, String date, String role, String isValidated) {
     Navigator.push(
@@ -345,7 +400,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => HistoryKkhScreen(
-          day: day,
           date: date,
           subtitle: subtitle,
           totalJamTidur: totalJamTidur,

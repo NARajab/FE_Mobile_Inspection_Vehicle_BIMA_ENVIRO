@@ -14,19 +14,19 @@ class _ForemanP2hState extends State<ForemanP2h> {
   bool isSearching = false;
 
   final List<Map<String, dynamic>> data = [
-    {'title': '01 April 2024 - Bulldozer', 'subtitle': 'Desta', 'idVehicle': 'Bulldozer', 'date': '2024-07-06', 'role': 'foreman', 'isValidated': false},
-    {'title': '01 April 2024 - Dump Truck', 'subtitle': 'Sule', 'idVehicle': 'Dump Truck', 'date': '2024-07-05', 'role': 'foreman', 'isValidated': true},
-    {'title': '02 April 2024 - Light Vehicle', 'subtitle': 'Andre', 'idVehicle': 'Light Vehicle', 'date': '2024-07-05', 'role': 'foreman', 'isValidated': false},
-    {'title': '02 April 2024 - Sarana Bus', 'subtitle': 'Parto', 'idVehicle': 'Sarana Bus', 'date': '2024-07-05', 'role': 'foreman', 'isValidated': true},
-    {'title': '02 April 2024 - Excavator', 'subtitle': 'Aziz Gagap', 'idVehicle': 'Excavator', 'date': '2024-07-05', 'role': 'foreman', 'isValidated': false},
+    {'title': '01 April 2024 - Bulldozer', 'subtitle': 'Desta', 'idVehicle': 'Bulldozer', 'date': '2024-07-06', 'role': 'Forman', 'isValidated': false},
+    {'title': '01 April 2024 - Dump Truck', 'subtitle': 'Sule', 'idVehicle': 'Dump Truck', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': true},
+    {'title': '02 April 2024 - Light Vehicle', 'subtitle': 'Andre', 'idVehicle': 'Light Vehicle', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': false},
+    {'title': '02 April 2024 - Sarana Bus', 'subtitle': 'Parto', 'idVehicle': 'Sarana Bus', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': true},
+    {'title': '02 April 2024 - Excavator', 'subtitle': 'Aziz Gagap', 'idVehicle': 'Excavator', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': false},
   ];
 
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredData = data
         .where((item) =>
-    item['title']!.toLowerCase().contains(filterText) ||
-        item['subtitle']!.toLowerCase().contains(filterText))
+    item['title']?.toLowerCase().contains(filterText) ?? false ||
+        item['subtitle']?.toLowerCase().contains(filterText) ?? false)
         .toList();
 
     filteredData.sort((a, b) {
@@ -112,18 +112,28 @@ class _ForemanP2hState extends State<ForemanP2h> {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: filteredData
-            .map((item) => _buildCard(
-          context,
-          item['id']!,
-          item['title']!,
-          item['subtitle']!,
-          item['idVehicle']!,
-          item['date']!,
-          item['role']!,
-          item['isValidated'] as bool,
-        ))
-            .toList(),
+            .map((item) {
+          final int p2hId = item['id'] as int? ?? 0; // Default to 0 or handle it as needed
+          final String title = item['title'] ?? 'No Title';
+          final String subtitle = item['subtitle'] ?? 'No Subtitle';
+          final String idVehicle = item['idVehicle'] ?? 'Unknown Vehicle';
+          final String date = item['date'] ?? 'No Date';
+          final String role = item['role'] ?? 'Unknown Role';
+          final bool isValidated = item['isValidated'] as bool? ?? false;
+
+          return _buildCard(
+            context,
+            p2hId,
+            title,
+            subtitle,
+            idVehicle,
+            date,
+            role,
+            isValidated,
+          );
+        }).toList(),
       ),
+
     );
   }
 
@@ -138,7 +148,7 @@ class _ForemanP2hState extends State<ForemanP2h> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title),
+              Text(title ?? 'No Title'),
               Container(
                 width: 10,
                 height: 10,
@@ -157,11 +167,12 @@ class _ForemanP2hState extends State<ForemanP2h> {
               ),
             ],
           ),
-          subtitle: Text(subtitle),
+          subtitle: Text(subtitle ?? 'No Subtitle'),
         ),
       ),
     );
   }
+
 }
 
 void navigateToForemanValidationP2h(BuildContext context, int p2hId, String idVehicle, String date, String role) {

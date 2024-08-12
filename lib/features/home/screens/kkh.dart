@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:myapp/features/home/services/kkh_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class KkhScreen extends StatefulWidget {
   const KkhScreen({super.key});
@@ -45,26 +46,46 @@ class _KkhScreenState extends State<KkhScreen> {
       );
       return;
     }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
     try {
       String totalJamTidur = '${jamController.text} Jam ${menitController.text} Menit';
 
       await _kkhServices.submitKkhData(
         totalJamTidur,
         _image,
-        token
+        token,
       );
 
       clearFields();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data submitted successfully')),
-      );
+
+      // Delay for a short time before closing the loading dialog
+      Future.delayed(const Duration(milliseconds: 300), () {
+        Navigator.of(context).pop();
+        // Show Flushbar after the loading dialog is closed
+        Flushbar(
+          title: 'Success',
+          message: 'Data submitted successfully!',
+          duration: const Duration(seconds: 3),
+          backgroundColor: Colors.green,
+        ).show(context);
+      });
+
     } catch (e) {
+      Navigator.of(context).pop(); // Close the loading dialog in case of error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -165,5 +186,4 @@ class _KkhScreenState extends State<KkhScreen> {
       ),
     );
   }
-
 }

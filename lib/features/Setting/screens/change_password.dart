@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/features/Setting/services/settings_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:another_flushbar/flushbar.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -11,6 +14,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   TextEditingController oldPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+  final ProfileServices _profileServices = ProfileServices();
 
   @override
   void dispose() {
@@ -20,61 +24,55 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     super.dispose();
   }
 
-  void changePassword() {
+  Future<void> changePassword() async {
     String oldPassword = oldPasswordController.text;
     String newPassword = newPasswordController.text;
     String confirmPassword = confirmPasswordController.text;
 
-    // Implementasi validasi disini, misalnya:
     if (oldPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('Please fill in all fields.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      _showFlushbar('Error', 'Please fill in all fields.');
       return;
     }
 
     if (newPassword != confirmPassword) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const Text('New password and confirm password do not match.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
+      _showFlushbar('Error', 'New password and confirm password do not match.');
       return;
     }
 
-    // Implementasi penyimpanan password baru sesuai kebutuhan aplikasi Anda
-    // Di sini bisa diimplementasikan kode untuk menyimpan password baru ke server atau penyimpanan lokal
-    // Misalnya:
-    // saveNewPassword(oldPassword, newPassword);
-    // Kemudian kembali ke halaman sebelumnya atau lakukan navigasi sesuai kebutuhan
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
 
-    Navigator.pop(context);
+    if (token != null) {
+      try {
+        await _profileServices.changePassword(
+          oldPassword,
+          newPassword,
+          confirmPassword,
+          token,
+        );
+
+        // Show success notification and navigate back to the settings screen
+        _showFlushbar('Success', 'Password changed successfully.', isSuccess: true);
+      } catch (e) {
+        _showFlushbar('Error', 'Failed to change password: $e');
+      }
+    }
+  }
+
+  void _showFlushbar(String title, String message, {bool isSuccess = false}) {
+    Flushbar(
+      title: title,
+      message: message,
+      duration: const Duration(seconds: 3),
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(context);
+
+    if (isSuccess) {
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pop(context);
+      });
+    }
   }
 
   @override
@@ -88,13 +86,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
         titleTextStyle: const TextStyle(
           color: Colors.white,
           fontSize: 20,
-          fontWeight: FontWeight.w400
+          fontWeight: FontWeight.w400,
         ),
         toolbarHeight: 45,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new), 
+          icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
-          onPressed: () { 
+          onPressed: () {
             Navigator.pop(context);
           },
         ),
@@ -143,22 +141,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               ElevatedButton(
                 onPressed: changePassword,
                 style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF304FFE),
-                textStyle: const TextStyle(
-                  fontSize: 18,
+                  backgroundColor: const Color(0xFF304FFE),
+                  textStyle: const TextStyle(
+                    fontSize: 18,
+                  ),
+                  foregroundColor: Colors.white,
+                  elevation: 5,
                 ),
-                foregroundColor: Colors.white,
-                elevation: 5,
-              ),
                 child: const Text('Change Password'),
               ),
             ],
           ),
-        )
+        ),
       ),
     );
-  }
-  void _navigateBack(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/settings');
   }
 }
