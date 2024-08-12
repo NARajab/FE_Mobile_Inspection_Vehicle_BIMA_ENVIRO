@@ -160,7 +160,6 @@ class _ForemanKkhState extends State<ForemanKkh> {
           context,
           MaterialPageRoute(
             builder: (context) => HistoryKkhScreen(
-              day: item['day']!,
               date: item['date']!,
               totalJamTidur: item['totalJamTidur']!,
               role: item['role']!,

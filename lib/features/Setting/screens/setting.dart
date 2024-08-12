@@ -1,50 +1,63 @@
+import 'dart:io';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dialogs/flutter_dialogs.dart';
+import 'package:myapp/features/Setting/services/settings_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingScreen extends StatelessWidget {
+class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
+
+  @override
+  _SettingScreenState createState() => _SettingScreenState();
+}
+
+class _SettingScreenState extends State<SettingScreen> {
+  String username = 'Loading...';
+  String email = 'Loading...';
+  String profileImageUrl = 'Loading...';
+  File? profileImageFile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      try {
+        ProfileServices profileServices = ProfileServices();
+        Map<String, dynamic> userData = await profileServices.getUserById(token);
+
+        setState(() {
+          username = userData['user']['name'] ?? 'No Name';
+          email = userData['user']['Auth']['email'] ?? 'No Email';
+          profileImageUrl = userData['user']['imageUrl'] ?? 'No Image';
+        });
+      } catch (e) {
+        // Handle the error appropriately, maybe show an error message
+        print('Error loading profile: $e');
+      }
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   backgroundColor: const Color(0xFF304FFE),
-      //   elevation: 5,
-      //   shadowColor: Colors.black,
-      //   title: const Text('Setting'),
-      //   titleTextStyle: const TextStyle(
-      //     color: Colors.white,
-      //     fontSize: 20,
-      //     fontWeight: FontWeight.w400
-      //   ),
-      //   toolbarHeight: 45,
-      //   leading: IconButton(
-      //     icon: const Icon(Icons.arrow_back_ios_new),
-      //     color: Colors.white,
-      //     onPressed: () {
-      //       _navigateBack(context);
-      //     },
-      //   ),
-      //   bottom: PreferredSize(
-      //     preferredSize: const Size.fromHeight(6),
-      //     child: Align(
-      //       alignment: Alignment.centerLeft,
-      //       child: Container(
-      //         width: 69,
-      //         height: 3,
-      //         color: Colors.white,
-      //       ),
-      //     ),
-      //   ),
-      // ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             _buildProfileHeader(),
             const SizedBox(height: 20),
-            _buildOptionCard(context, 'Profile', 'assets/images/profile.png', () => _onProfileTap(context) ),
-            _buildOptionCard(context, 'Change Password', 'assets/images/cp.png', () => _onChangePasswordTap(context) ),
+            _buildOptionCard(context, 'Profile', 'assets/images/profile.png', () => _onProfileTap(context)),
+            _buildOptionCard(context, 'Change Password', 'assets/images/cp.png', () => _onChangePasswordTap(context)),
             _buildOptionCard(context, 'Logout', 'assets/images/logout.png', () => _onLogoutTap(context)),
           ],
         ),
@@ -53,25 +66,27 @@ class SettingScreen extends StatelessWidget {
   }
 
   Widget _buildProfileHeader() {
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundImage: AssetImage('assets/images/person.png'),
+            backgroundImage: profileImageFile != null
+                ? FileImage(profileImageFile!)
+                : NetworkImage(profileImageUrl) as ImageProvider,
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'John Doe',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                username ?? 'Loading...',
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Text(
-                'johndoe@example.com',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                email ?? 'Loading...',
+                style: const TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],
           ),
@@ -116,26 +131,59 @@ class SettingScreen extends StatelessWidget {
   }
 
   void _onLogoutTap(BuildContext context) {
-    showPlatformDialog(
-      context: context,
-      builder: (_) => BasicDialogAlert(
-        title: const Text("Logout"),
-        content: const Text("Are you sure you want to logout?"),
-        actions: <Widget>[
-          BasicDialogAction(
-            title: const Text("Cancel"),
+    Flushbar(
+      title: "Logout",
+      message: "Are you sure you want to logout?",
+      duration: null,
+      mainButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _logout(context);
+            },
+            child: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-          ),
-          BasicDialogAction(
-            title: const Text("Logout"),
-            onPressed: () {
-              Navigator.of(context).popUntil(ModalRoute.withName('/'));
-            },
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
+      isDismissible: true,
+      flushbarStyle: FlushbarStyle.FLOATING,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      borderRadius: BorderRadius.circular(8),
+      backgroundColor: Colors.black,
+      icon: const Icon(
+        Icons.warning,
+        size: 28.0,
+        color: Colors.yellow,
+      ),
+      leftBarIndicatorColor: Colors.yellow,
+    ).show(context);
+  }
+
+
+  void _logout(BuildContext context) async {
+    // Remove the token from SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+
+    // Navigate to the login page
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/login',
+          (Route<dynamic> route) => false,
     );
   }
 }

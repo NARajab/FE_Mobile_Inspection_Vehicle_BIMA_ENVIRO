@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:myapp/features/Setting/services/settings_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'package:another_flushbar/flushbar.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final String currentUsername;
@@ -56,15 +59,59 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  void saveChanges() {
-    Map<String, dynamic> editedData = {
-      'username': usernameController.text,
-      'email': emailController.text,
-      'phoneNumber': phoneNumberController.text,
-      'profileImageUrl': newProfileImageUrl,
-      'profileImageFile': newProfileImage,
-    };
-    Navigator.pop(context, editedData);
+  Future<void> saveChanges() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      ProfileServices profileServices = ProfileServices();
+      try {
+        await profileServices.updateProfile(
+          token,
+          usernameController.text,
+          emailController.text,
+          phoneNumberController.text,
+          newProfileImage,
+        );
+
+        // Show success notification
+        _showFlushbar('Success', 'Profile updated successfully.', isSuccess: true);
+
+        // Delay the navigation slightly to allow the Flushbar to finish its animation
+        await Future.delayed(const Duration(milliseconds: 2000));
+
+        // Return the edited data to the previous screen
+        Map<String, dynamic> editedData = {
+          'username': usernameController.text,
+          'email': emailController.text,
+          'phoneNumber': phoneNumberController.text,
+          'profileImageUrl': widget.currentProfileImageUrl,
+          'profileImageFile': newProfileImage,
+        };
+      } catch (e) {
+        // Show error notification
+        _showFlushbar('Error', 'Failed to update profile: $e');
+      }
+
+
+    }
+  }
+
+
+  void _showFlushbar(String title, String message, {bool isSuccess = false}) {
+    Flushbar(
+      title: title,
+      message: message,
+      duration: const Duration(seconds: 3),
+      backgroundColor: isSuccess ? Colors.green : Colors.red,
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(context);
+
+    if (isSuccess) {
+      Future.delayed(const Duration(seconds: 3), () {
+        Navigator.pop(context);
+      });
+    }
   }
 
   @override
@@ -157,5 +204,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
       ),
     );
+  }
+  void _navigateBack(BuildContext context) {
+    Navigator.pushReplacementNamed(context, '/profile');
   }
 }

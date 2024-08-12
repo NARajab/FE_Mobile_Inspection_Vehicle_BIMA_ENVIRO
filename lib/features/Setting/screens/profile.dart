@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-
+import 'package:myapp/features/Setting/services/settings_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'edit_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -11,11 +12,39 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  String username = 'John Doe';
-  String email = 'johndoe@example.com';
-  String phoneNumber = '+1234567890';
-  String profileImageUrl = 'https://ik.imagekit.io/AliRajab03/person.png?updatedAt=1719966082276';
+  String username = 'Loading...';
+  String email = 'Loading...';
+  String phoneNumber = 'Loading...';
+  String profileImageUrl = 'Loading...';
   File? profileImageFile;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      try {
+        ProfileServices profileServices = ProfileServices();
+        Map<String, dynamic> userData = await profileServices.getUserById(token);
+
+        setState(() {
+          username = userData['user']['name'] ?? 'No Name';
+          email = userData['user']['Auth']['email'] ?? 'No Email';
+          phoneNumber = userData['user']['phoneNumber'] ?? 'No Phone Number';
+          profileImageUrl = userData['user']['imageUrl'] ?? 'No Image';
+        });
+      } catch (e) {
+        // Handle the error appropriately, maybe show an error message
+        print('Error loading profile: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

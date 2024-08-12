@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 class HistoryKkhScreen extends StatelessWidget {
-  final String day;
   final String date;
   final String subtitle;
   final String totalJamTidur;
@@ -14,7 +13,6 @@ class HistoryKkhScreen extends StatelessWidget {
 
   const HistoryKkhScreen({
     super.key,
-    required this.day,
     required this.date,
     required this.totalJamTidur,
     required this.role,
@@ -64,7 +62,6 @@ class HistoryKkhScreen extends StatelessWidget {
             children: [
               _buildHistoryCard(
                 context,
-                day: day,
                 date: date,
                 totalJamTidur: totalJamTidur,
                 role: role,
@@ -81,7 +78,6 @@ class HistoryKkhScreen extends StatelessWidget {
 
   Widget _buildHistoryCard(
       BuildContext context, {
-        required String day,
         required String date,
         required String totalJamTidur,
         required String role,
@@ -108,8 +104,8 @@ class HistoryKkhScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '$day, $date',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  '$date',
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ],
             ),

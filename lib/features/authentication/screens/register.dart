@@ -281,9 +281,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           message: response['message'] ?? 'Register successful',
           duration: const Duration(seconds: 3),
           backgroundColor: Colors.green,
-          flushbarPosition: FlushbarPosition.TOP,
-          margin: const EdgeInsets.all(8),
-          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP
         ).show(context);
         await Future.delayed(const Duration(seconds: 3));
         Navigator.pushReplacement(
@@ -295,9 +293,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           message: response['message'] ?? 'Register failed',
           duration: const Duration(seconds: 3),
           backgroundColor: Colors.red,
-          flushbarPosition: FlushbarPosition.TOP,
-          margin: const EdgeInsets.all(8),
-          borderRadius: BorderRadius.circular(8),
+          flushbarPosition: FlushbarPosition.TOP
         ).show(context);
         throw Exception('Failed to register');
       }
@@ -308,8 +304,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         duration: const Duration(seconds: 3),
         backgroundColor: Colors.red,
         flushbarPosition: FlushbarPosition.TOP,
-        margin: const EdgeInsets.all(8),
-        borderRadius: BorderRadius.circular(8),
       ).show(context);
     }
   }

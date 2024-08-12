@@ -28,8 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text,
       );
 
-      print("Login result: $result");
-
       if (result['status'] == 'success') {
         final token = result['token'];
         final role = result['role'];
@@ -40,8 +38,6 @@ class _LoginScreenState extends State<LoginScreen> {
             duration: const Duration(seconds: 3),
             backgroundColor: Colors.red,
             flushbarPosition: FlushbarPosition.TOP,
-            margin: const EdgeInsets.all(8),
-            borderRadius: BorderRadius.circular(8),
           ).show(context);
           return;
         }
@@ -56,8 +52,6 @@ class _LoginScreenState extends State<LoginScreen> {
             duration: const Duration(seconds: 3),
             backgroundColor: Colors.green,
             flushbarPosition: FlushbarPosition.TOP,
-            margin: const EdgeInsets.all(8),
-            borderRadius: BorderRadius.circular(8),
           ).show(context);
 
           await Future.delayed(const Duration(seconds: 2));
@@ -73,8 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
             duration: const Duration(seconds: 3),
             backgroundColor: Colors.red,
             flushbarPosition: FlushbarPosition.TOP,
-            margin: const EdgeInsets.all(8),
-            borderRadius: BorderRadius.circular(8),
           ).show(context);
         }
       } else {
@@ -83,8 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
           duration: const Duration(seconds: 3),
           backgroundColor: Colors.red,
           flushbarPosition: FlushbarPosition.TOP,
-          margin: const EdgeInsets.all(8),
-          borderRadius: BorderRadius.circular(8),
         ).show(context);
       }
     } catch (e) {
@@ -94,8 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
         duration: const Duration(seconds: 3),
         backgroundColor: Colors.red,
         flushbarPosition: FlushbarPosition.TOP,
-        margin: const EdgeInsets.all(8),
-        borderRadius: BorderRadius.circular(8),
       ).show(context);
     }
   }
