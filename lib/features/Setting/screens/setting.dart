@@ -118,10 +118,6 @@ class _SettingScreenState extends State<SettingScreen> {
     );
   }
 
-  void _navigateBack(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/home');
-  }
-
   void _onProfileTap(BuildContext context) {
     Navigator.pushNamed(context, '/profile');
   }

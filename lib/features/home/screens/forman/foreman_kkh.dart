@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../history/screens/history_kkh.dart';
+import '../../services/p2h_foreman_services.dart';
 
 class ForemanKkh extends StatefulWidget {
   const ForemanKkh({super.key});
@@ -12,68 +15,71 @@ class ForemanKkh extends StatefulWidget {
 class _ForemanKkhState extends State<ForemanKkh> {
   String filterText = '';
   bool isSearching = false;
+  bool isLoading = true;
+  String role = '';
 
-  final List<Map<String, String>> data = [
-    {
-      'name': 'Asep',
-      'date': '2024-07-06',
-      'role': 'foreman',
-      'day': 'Monday',
-      'totalJamTidur': '7h 5m',
-      'subtitle': 'Fit to work',
-      'isValidated': 'true',
-      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1719707258551._H7RYLl8f_.jpg?updatedAt=1719707261329'
-    },
-    {
-      'name': 'Kurniawan',
-      'date': '2024-07-05',
-      'role': 'foreman',
-      'day': 'Tuesday',
-      'totalJamTidur': '7h 5m',
-      'subtitle': 'Headache',
-      'isValidated': 'false',
-      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1717269588897._L1v_b3Xxs.jpeg?updatedAt=1717269592622'
-    },
-    {
-      'name': 'Kusep',
-      'date': '2024-07-05',
-      'role': 'foreman',
-      'day': 'Tuesday',
-      'totalJamTidur': '7h 5m',
-      'subtitle': 'Tiredness',
-      'isValidated': 'true',
-      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1716628280492._vYkSwuJFd.png?updatedAt=1716628284144'
-    },
-    {
-      'name': 'Hermawan',
-      'date': '2024-07-05',
-      'role': 'foreman',
-      'day': 'Tuesday',
-      'totalJamTidur': '7h 5m',
-      'subtitle': 'Fit to work',
-      'isValidated': 'false',
-      'imageUrl': 'https://ik.imagekit.io/AliRajab03/IMG-1716042874421._bFugJUAE6f.png?updatedAt=1716042887192'
-    },
-  ];
+  List<Map<String, dynamic>> data = [];
+
+  late ForemanServices _data;
 
   @override
   void initState() {
     super.initState();
-    _updateTitles();
+    _data = ForemanServices();
+    _loadData();
+    _loadRole();
   }
 
-  void _updateTitles() {
-    for (var item in data) {
-      final date = DateTime.parse(item['date']!);
-      final formattedDate = DateFormat('dd MMMM yyyy').format(date);
-      item['title'] = '$formattedDate - ${item['name']}';
+  Future<void> _loadData() async {
+    try {
+      final response = await _data.getAllKkh();
+      if (response['status'] == 'success' && response['kkh'] != null) {
+        setState(() {
+          data = List<Map<String, dynamic>>.from(response['kkh']);
+          isLoading = false;
+        });
+      } else {
+        print('Failed to load Kkh data or no data available.');
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error occurred while loading Kkh history data: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _loadRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      setState(() {
+        role = decodedToken['role'] ?? ''; // Extract role from token
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Sort data so that items with isValidated == 'false' appear first
-    data.sort((a, b) => a['isValidated']!.compareTo(b['isValidated']!));
+    // Sort data so that items with isValidated == false appear first
+    data.sort((a, b) {
+      final aValidation = a['fValidation'] ?? false;
+      final bValidation = b['fValidation'] ?? false;
+
+      // Sorting such that false (not validated) comes first
+      if (aValidation == bValidation) {
+        return 0;
+      } else if (!aValidation && bValidation) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -138,33 +144,64 @@ class _ForemanKkhState extends State<ForemanKkh> {
           ),
         ],
       ),
-      body: ListView(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
         padding: const EdgeInsets.all(16.0),
         children: data
-            .where((item) =>
-        item['title']!.toLowerCase().contains(filterText) ||
-            item['subtitle']!.toLowerCase().contains(filterText))
-            .map((item) => _buildCard(
-          context,
-          item,
-        ))
+            .where((item) {
+          final createdAt = item['createdAt']?.toLowerCase() ?? '';
+          final userName = item['User']['name']?.toLowerCase() ?? '';
+          return createdAt.contains(filterText) ||
+              userName.contains(filterText);
+        })
+            .map((item) => _buildCard(context, item))
             .toList(),
       ),
     );
   }
 
-  Widget _buildCard(BuildContext context, Map<String, String> item) {
+  Widget _buildCard(BuildContext context, Map<String, dynamic> item) {
+    final createdAt = item['createdAt'];
+    final userName = item['User']['name'];
+    final complaint = item['complaint'];
+
+    if (createdAt == null || userName == null) {
+      return const SizedBox(); // Return an empty widget if data is missing
+    }
+
+    final formattedDate = DateFormat('dd MMMM yyyy').format(
+      DateTime.parse(createdAt),
+    );
+
+    Color complaintColor;
+    switch (complaint) {
+      case 'Fit to work':
+        complaintColor = Colors.green;
+        break;
+      case 'On Monitoring':
+        complaintColor = Colors.orange;
+        break;
+      case 'Kurang Tidur':
+        complaintColor = Colors.red;
+        break;
+      default:
+        complaintColor = Colors.black; // Default color if no match found
+    }
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => HistoryKkhScreen(
-              date: item['date']!,
-              totalJamTidur: item['totalJamTidur']!,
-              role: item['role']!,
-              imageUrl: item['imageUrl']!,
-              isValidated: item['isValidated'] == 'true', subtitle: '',
+              kkhId:item['id'] ?? '',
+              date: item['date'] ?? '',
+              totalJamTidur: item['totaltime'] ?? '',
+              role: role,
+              imageUrl: item['imageUrl'] ?? '',
+              isValidated: item['fValidation'] ?? false,
+              subtitle: '',
             ),
           ),
         );
@@ -175,16 +212,18 @@ class _ForemanKkhState extends State<ForemanKkh> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(item['title']!),
+              Text('$formattedDate - $userName'),
               Container(
                 width: 10,
                 height: 10,
                 decoration: BoxDecoration(
-                  color: item['isValidated'] == 'true' ? Colors.green : Colors.red,
+                  color: (item['fValidation'] ?? false)
+                      ? Colors.green
+                      : Colors.red,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: item['isValidated'] == 'true'
+                      color: (item['fValidation'] ?? false)
                           ? Colors.green.withOpacity(0.5)
                           : Colors.red.withOpacity(0.5),
                       spreadRadius: 2,
@@ -196,7 +235,12 @@ class _ForemanKkhState extends State<ForemanKkh> {
               ),
             ],
           ),
-          subtitle: Text(item['subtitle']!),
+          subtitle: Text(
+            complaint,
+            style: TextStyle(
+              color: complaintColor,
+            ),
+          ),
         ),
       ),
     );
