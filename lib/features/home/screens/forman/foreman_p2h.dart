@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:myapp/features/home/screens/forman/foreman_validation_p2h.dart';
+import 'package:myapp/features/home/services/p2h_foreman_services.dart';
 
 class ForemanP2h extends StatefulWidget {
   const ForemanP2h({super.key});
@@ -12,37 +14,85 @@ class ForemanP2h extends StatefulWidget {
 class _ForemanP2hState extends State<ForemanP2h> {
   String filterText = '';
   bool isSearching = false;
+  bool isLoading = true;
+  String role = '';
 
-  final List<Map<String, dynamic>> data = [
-    {'title': '01 April 2024 - Bulldozer', 'subtitle': 'Desta', 'idVehicle': 'Bulldozer', 'date': '2024-07-06', 'role': 'Forman', 'isValidated': false},
-    {'title': '01 April 2024 - Dump Truck', 'subtitle': 'Sule', 'idVehicle': 'Dump Truck', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': true},
-    {'title': '02 April 2024 - Light Vehicle', 'subtitle': 'Andre', 'idVehicle': 'Light Vehicle', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': false},
-    {'title': '02 April 2024 - Sarana Bus', 'subtitle': 'Parto', 'idVehicle': 'Sarana Bus', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': true},
-    {'title': '02 April 2024 - Excavator', 'subtitle': 'Aziz Gagap', 'idVehicle': 'Excavator', 'date': '2024-07-05', 'role': 'Forman', 'isValidated': false},
-  ];
+  List<Map<String, dynamic>> data = [];
+
+  late ForemanServices _data;
+
+  @override
+  void initState(){
+    super.initState();
+    _data = ForemanServices();
+    _loadData();
+    _loadRole();
+  }
+
+  Future<void> _loadData() async {
+    try{
+      final response = await _data.getAllP2hUsers();
+      if (response['status'] == 'success' && response['p2h'] != null) {
+        setState(() {
+          data = List<Map<String, dynamic>>.from(response['p2h']);
+          isLoading = false; // Set isLoading menjadi false setelah data dimuat
+        });
+      } else {
+        print('Failed to load P2h data or no data available.');
+        setState(() {
+          isLoading = false; // Set isLoading menjadi false jika data tidak tersedia
+        });
+      }
+    } catch (e){
+      print('Error occurred while loading P2h history data: $e');
+      setState(() {
+        isLoading = false; // Set isLoading menjadi false jika terjadi error
+      });
+    }
+  }
+
+  Future<void> _loadRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    if (token != null) {
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      setState(() {
+        role = decodedToken['role'] ?? ''; // Extract role from token
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> filteredData = data
-        .where((item) =>
-    item['title']?.toLowerCase().contains(filterText) ?? false ||
-        item['subtitle']?.toLowerCase().contains(filterText) ?? false)
+        .where((item) {
+      final p2h = item['P2h'] ?? {};
+
+      final date = p2h['date']?.toLowerCase() ?? '';
+      final vehicleType = p2h['Vehicle']?['type']?.toLowerCase() ?? '';
+      final jobsite = p2h['jobsite']?.toLowerCase() ?? '';
+
+      return date.contains(filterText) ||
+          vehicleType.contains(filterText) ||
+          jobsite.contains(filterText);
+    })
         .toList();
 
     filteredData.sort((a, b) {
-      // Extract and parse the dates from the titles
-      DateTime dateA = DateFormat('dd MMMM yyyy').parse(a['title']!.split(' - ')[0]);
-      DateTime dateB = DateFormat('dd MMMM yyyy').parse(b['title']!.split(' - ')[0]);
+      final p2hA = a['P2h'];
+      final p2hB = b['P2h'];
 
-      // Compare dates first (newest first)
-      int dateComparison = dateB.compareTo(dateA);
+      DateTime? dateA = DateTime.tryParse(a['P2h']['createdAt']);
+      DateTime? dateB = DateTime.tryParse(b['P2h']['createdAt']);
+
+      int dateComparison = (dateB ?? DateTime.now()).compareTo(dateA ?? DateTime.now());
       if (dateComparison != 0) {
         return dateComparison;
       }
 
-      // If dates are the same, compare isValidated (false first)
-      bool isValidatedA = a['isValidated'] as bool;
-      bool isValidatedB = b['isValidated'] as bool;
+      bool isValidatedA = a['fValidation'] as bool;
+      bool isValidatedB = b['fValidation'] as bool;
       return isValidatedA ? 1 : -1; // false (not validated) should come first
     });
 
@@ -109,17 +159,20 @@ class _ForemanP2hState extends State<ForemanP2h> {
           ),
         ],
       ),
-      body: ListView(
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
         padding: const EdgeInsets.all(16.0),
         children: filteredData
             .map((item) {
-          final int p2hId = item['id'] as int? ?? 0; // Default to 0 or handle it as needed
-          final String title = item['title'] ?? 'No Title';
-          final String subtitle = item['subtitle'] ?? 'No Subtitle';
-          final String idVehicle = item['idVehicle'] ?? 'Unknown Vehicle';
-          final String date = item['date'] ?? 'No Date';
-          final String role = item['role'] ?? 'Unknown Role';
-          final bool isValidated = item['isValidated'] as bool? ?? false;
+          final p2h = item['P2h'];
+          final int p2hId = item['p2hId'] as int? ?? 0; // Default to 0 or handle it as needed
+          final String title = p2h['date'] ?? 'No Title';
+          final String subtitle = item['User']['name'] ?? 'No Subtitle';
+          final String idVehicle = p2h['Vehicle']['type'].toString() ?? 'Unknown Vehicle';
+          final String vehicle = p2h['Vehicle']['type'] ?? 'Unknown Vehicle';
+          final String date = p2h['date'] ?? 'No Date';
+          final bool isValidated = item['fValidation'] as bool? ?? false;
 
           return _buildCard(
             context,
@@ -130,14 +183,15 @@ class _ForemanP2hState extends State<ForemanP2h> {
             date,
             role,
             isValidated,
+            vehicle
           );
         }).toList(),
       ),
-
     );
   }
 
-  Widget _buildCard(BuildContext context, int p2hId, String title, String subtitle, String idVehicle, String date, String role, bool isValidated) {
+
+  Widget _buildCard(BuildContext context, int p2hId, String title, String subtitle, String idVehicle, String date, String role, bool isValidated, String vehicle) {
     return GestureDetector(
       onTap: () {
         navigateToForemanValidationP2h(context, p2hId, idVehicle, date, role);
@@ -167,12 +221,11 @@ class _ForemanP2hState extends State<ForemanP2h> {
               ),
             ],
           ),
-          subtitle: Text(subtitle ?? 'No Subtitle'),
+          subtitle: Text('$vehicle - $subtitle' ?? 'No Subtitle'),
         ),
       ),
     );
   }
-
 }
 
 void navigateToForemanValidationP2h(BuildContext context, int p2hId, String idVehicle, String date, String role) {

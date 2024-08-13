@@ -321,11 +321,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   navigateToHistoryKkh(
                     context,
                     formattedDate,
-                    historyItem['date'],
-                    historyItem['complaint'],
-                    historyItem['totaltime'],
-                    historyItem['imageUrl'],
-                    historyItem['wValidation'].toString(),
+                    historyItem['id'] as int,
+                    historyItem['date'] as String,
+                    historyItem['complaint'] as String,
+                    historyItem['totaltime'] as String,
+                    historyItem['imageUrl'] as String,
+                    historyItem['fValidation'] == true,
                   );
                 },
                 child: Card(
@@ -395,19 +396,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  void navigateToHistoryKkh(BuildContext context, String day, String date, String subtitle, String totalJamTidur, String imageUrl, String isValidated) {
+  void navigateToHistoryKkh(
+      BuildContext context,
+      String formattedDate,
+      int kkhId,
+      String date,
+      String complaint,
+      String totaltime,
+      String imageUrl,
+      bool isValidated) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => HistoryKkhScreen(
           date: date,
-          subtitle: subtitle,
-          totalJamTidur: totalJamTidur,
+          subtitle: complaint,
+          totalJamTidur: totaltime,
           imageUrl: imageUrl,
-          isValidated: isValidated == 'true',
-          role: '',
+          isValidated: isValidated,
+          role: '', // Pastikan untuk mengirimkan role jika diperlukan
+          kkhId: kkhId,
         ),
       ),
     );
   }
+
 }

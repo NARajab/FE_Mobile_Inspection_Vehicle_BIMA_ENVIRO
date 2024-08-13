@@ -5,13 +5,16 @@ import 'package:myapp/features/history/services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:myapp/features/history/screens/template/timesheet_template.dart';
+import 'package:myapp/features/home/services/p2h_foreman_services.dart';
 
 class ExcavatorTemplate extends StatefulWidget {
   final int p2hId;
+  final String role;
 
   const ExcavatorTemplate({
     super.key,
     required this.p2hId,
+    required this.role
   });
 
   @override
@@ -20,6 +23,7 @@ class ExcavatorTemplate extends StatefulWidget {
 
 class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
   final P2hHistoryServices _p2hHistoryServices = P2hHistoryServices();
+  final ForemanServices _foremanServices = ForemanServices();
   late Future<Map<String, dynamic>> _p2hData;
   late Future<String> _operatorName;
 
@@ -50,6 +54,25 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
       backgroundColor: Colors.red,
       flushbarPosition: FlushbarPosition.TOP,
     ).show(context);
+  }
+
+  Future<void> _validateForeman() async {
+    try {
+      await _foremanServices.foremanValidation(widget.p2hId);
+      Flushbar(
+        title: 'Success',
+        message: 'Validation successful',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.green,
+      ).show(context);
+    } catch (e) {
+      Flushbar(
+        title: 'Error',
+        message: 'Failed to validate: $e',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+      ).show(context);
+    }
   }
 
   @override
@@ -205,6 +228,36 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
                               ),
                             ),
                           ),
+                          if (widget.role == 'Forman') ...[
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            _validateForeman();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: const Color(0xFF304FFE),
+                                            textStyle: const TextStyle(fontSize: 18),
+                                            foregroundColor: Colors.white,
+                                            elevation: 5,
+                                          ),
+                                          child: const Text('Validation'),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

@@ -1,18 +1,21 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:myapp/features/home/services/p2h_foreman_services.dart';
+import 'package:another_flushbar/flushbar.dart';
 
-class HistoryKkhScreen extends StatelessWidget {
+class HistoryKkhScreen extends StatefulWidget {
   final String date;
   final String subtitle;
   final String totalJamTidur;
   final String role;
   final String imageUrl;
   final bool isValidated;
+  final int kkhId;
 
   const HistoryKkhScreen({
     super.key,
+    required this.kkhId,
     required this.date,
     required this.totalJamTidur,
     required this.role,
@@ -20,6 +23,32 @@ class HistoryKkhScreen extends StatelessWidget {
     required this.isValidated,
     required this.subtitle,
   });
+
+  @override
+  HistoryKkhScreenState createState() => HistoryKkhScreenState();
+}
+
+class HistoryKkhScreenState extends State<HistoryKkhScreen> {
+  final ForemanServices _foremanServices = ForemanServices();
+
+  Future<void> _validateForeman() async {
+    try {
+      await _foremanServices.foremanValidationKkh(widget.kkhId);
+      Flushbar(
+        title: 'Success',
+        message: 'Validation successful',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.green,
+      ).show(context);
+    } catch (e) {
+      Flushbar(
+        title: 'Error',
+        message: 'Failed to validate: $e',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+      ).show(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +91,12 @@ class HistoryKkhScreen extends StatelessWidget {
             children: [
               _buildHistoryCard(
                 context,
-                date: date,
-                totalJamTidur: totalJamTidur,
-                role: role,
-                imageUrl: imageUrl,
-                isValidated: isValidated,
+                kkhId: widget.kkhId,
+                date: widget.date,
+                totalJamTidur: widget.totalJamTidur,
+                role: widget.role,
+                imageUrl: widget.imageUrl,
+                isValidated: widget.isValidated,
               ),
               // Add more _buildHistoryCard widgets here as needed
             ],
@@ -78,6 +108,7 @@ class HistoryKkhScreen extends StatelessWidget {
 
   Widget _buildHistoryCard(
       BuildContext context, {
+        required int kkhId,
         required String date,
         required String totalJamTidur,
         required String role,
@@ -124,15 +155,15 @@ class HistoryKkhScreen extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-            if (role == 'foreman')
+            if (role == 'Forman')
               Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.only(right: 16.0, left: 16.0, top: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // function submit
+                        _validateForeman();
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF304FFE),

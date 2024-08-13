@@ -4,6 +4,7 @@ import '../../../history/screens/template/bus_template.dart';
 import '../../../history/screens/template/dump_truck_template.dart';
 import '../../../history/screens/template/excavator_template.dart';
 import '../../../history/screens/template/light_vehicle_template.dart';
+import './notes_screen.dart';
 
 class Foremanvalidationp2hScreen extends StatelessWidget{
   final int p2hId;
@@ -19,18 +20,18 @@ class Foremanvalidationp2hScreen extends StatelessWidget{
     required this.role
   });
 
-  Widget _buildTemplate(int p2hId, String role){
+  Widget _buildTemplate(int p2hId, String role, String date, String entry){
     switch (idVehicle) {
       case 'Bulldozer':
-        return BulldozerTemplate(p2hId: p2hId);
+        return BulldozerTemplate(p2hId: p2hId, role: role);
       case 'Dump Truck':
-        return DumpTruckTemplate(p2hId: p2hId);
+        return DumpTruckTemplate(p2hId: p2hId, role: role);
       case 'Excavator':
-        return ExcavatorTemplate(p2hId: p2hId);
+        return ExcavatorTemplate(p2hId: p2hId, role: role);
       case 'Light Vehicle':
-        return LightVehicleTemplate(p2hId: p2hId);
+        return LightVehicleTemplate(p2hId: p2hId, role: role);
       case 'Sarana Bus':
-        return BusTemplate(p2hId: p2hId);
+        return BusTemplate(p2hId: p2hId, role: role);
       default:
         return Container();
     }
@@ -41,7 +42,7 @@ class Foremanvalidationp2hScreen extends StatelessWidget{
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Validation form P2H'),
+        title: Text('Validation form P2H $role'),
         backgroundColor:  const Color(0xFF304FFE),
         elevation: 5,
         shadowColor: Colors.black,
@@ -69,6 +70,20 @@ class Foremanvalidationp2hScreen extends StatelessWidget{
             )
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notes),
+            color: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NoteScreen(p2hId: p2hId),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: 1,
@@ -78,7 +93,7 @@ class Foremanvalidationp2hScreen extends StatelessWidget{
             'date': date,
             'entry': 'Example entry description'
           };
-          return _buildTemplate(p2hId, 'foreman');
+          return _buildTemplate(p2hId, role, date, entry['entry']!);
         }
       ),
     );

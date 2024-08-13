@@ -25,15 +25,15 @@ class HistoryP2hScreen extends StatelessWidget {
   Widget _buildTemplate(int p2hId, String idVehicle, String date, String entry) {
     switch (idVehicle) {
       case 'Bulldozer':
-        return BulldozerTemplate(p2hId: p2hId);
+        return BulldozerTemplate(p2hId: p2hId, role: role,);
       case 'Dump Truck':
-        return DumpTruckTemplate(p2hId: p2hId);
+        return DumpTruckTemplate(p2hId: p2hId, role: role);
       case 'Excavator':
-        return ExcavatorTemplate(p2hId: p2hId);
+        return ExcavatorTemplate(p2hId: p2hId, role: role);
       case 'Light Vehicle':
-        return LightVehicleTemplate(p2hId: p2hId);
+        return LightVehicleTemplate(p2hId: p2hId, role: role);
       case 'Sarana Bus':
-        return BusTemplate(p2hId: p2hId);
+        return BusTemplate(p2hId: p2hId, role: role);
       default:
         return Container();
     }

@@ -3,13 +3,17 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:myapp/features/history/services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:myapp/features/home/services/p2h_foreman_services.dart';
 
 class DumpTruckTemplate extends StatefulWidget {
   final int p2hId;
+  final String role;
 
   const DumpTruckTemplate({
     super.key,
     required this.p2hId,
+    required this.role
   });
 
   @override
@@ -18,6 +22,7 @@ class DumpTruckTemplate extends StatefulWidget {
 
 class DumpTruckTemplateState extends State<DumpTruckTemplate> {
   final P2hHistoryServices _p2hHistoryServices = P2hHistoryServices();
+  final ForemanServices _foremanServices = ForemanServices();
   late Future<Map<String, dynamic>> _p2hData;
   late Future<String> operatorNameFuture;
   String? role;
@@ -44,6 +49,25 @@ class DumpTruckTemplateState extends State<DumpTruckTemplate> {
         role = 'Forman';
       });
       return 'Unknown';
+    }
+  }
+
+  Future<void> _validateForeman() async {
+    try {
+      await _foremanServices.foremanValidation(widget.p2hId);
+      Flushbar(
+        title: 'Success',
+        message: 'Validation successful',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.green,
+      ).show(context);
+    } catch (e) {
+      Flushbar(
+        title: 'Error',
+        message: 'Failed to validate: $e',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+      ).show(context);
     }
   }
 
@@ -193,27 +217,14 @@ class DumpTruckTemplateState extends State<DumpTruckTemplate> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const SizedBox(height: 12),
-                                  const Text(
-                                    'Catatan/Temuan:',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const TextField(
-                                    decoration: InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      hintText: 'Tambahkan catatan...',
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
                                   Padding(
-                                    padding: const EdgeInsets.all(16.0),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.stretch,
                                       children: [
                                         ElevatedButton(
                                           onPressed: () {
-                                            // function submit
+                                            _validateForeman();
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: const Color(0xFF304FFE),
@@ -221,7 +232,7 @@ class DumpTruckTemplateState extends State<DumpTruckTemplate> {
                                             foregroundColor: Colors.white,
                                             elevation: 5,
                                           ),
-                                          child: const Text('Submit'),
+                                          child: const Text('Validation'),
                                         ),
                                       ],
                                     ),
