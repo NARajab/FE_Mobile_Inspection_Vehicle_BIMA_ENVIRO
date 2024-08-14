@@ -61,4 +61,22 @@ class P2hHistoryServices{
       throw Exception('Error: $e');
     }
   }
+
+  Future<Map<String, dynamic>> getAllP2hUser() async {
+    const String endpoint = '/p2h/all';
+    final String apiUrl = '$baseUrl$endpoint';
+
+    try{
+      final response = await http.get(
+          Uri.parse(apiUrl)
+      );
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to load data');
+      }
+    }catch (e){
+      throw Exception('Error $e');
+    }
+  }
 }

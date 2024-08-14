@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:myapp/features/history/screens/history_p2h.dart';
 import 'package:myapp/features/history/screens/history_kkh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,8 +40,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     if (token != null) {
       try {
-        final response = await _p2hHistoryServices.getAllP2h(token);
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        String role = decodedToken['role'];
 
+        final Map<String, dynamic> response;
+        if (role == 'Driver') {
+          response = await _p2hHistoryServices.getAllP2h(token);
+        } else if (role == 'Forman') {
+          response = await _p2hHistoryServices.getAllP2hUser();
+        } else {
+          print('Unknown role: $role');
+          setState(() {
+            isLoading = false; // Set isLoading menjadi false jika role tidak dikenal
+          });
+          return;
+        }
         if (response['status'] == 'success' && response['p2h'] != null) {
           setState(() {
             p2hHistoryData = List<Map<String, dynamic>>.from(response['p2h']);
@@ -66,13 +80,28 @@ class _HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
+
   Future<void> _loadKkhHistoryData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
     if (token != null) {
       try {
-        final response = await _kkhHistoryServices.getAllKkh(token);
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        String role = decodedToken['role'];
+
+        final Map<String, dynamic> response;
+        if (role == 'Driver') {
+          response = await _kkhHistoryServices.getAllKkh(token);
+        } else if (role == 'Forman') {
+          response = await _kkhHistoryServices.getAllKkhUser();
+        } else {
+          print('Unknown role: $role');
+          setState(() {
+            isLoading = false; // Set isLoading menjadi false jika role tidak dikenal
+          });
+          return;
+        }
 
         if (response['status'] == 'success' && response['kkh'] != null) {
           setState(() {
@@ -257,10 +286,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildKKHTab(List<Map<String, dynamic>> kkhData) {
     List<Map<String, dynamic>> filteredData = kkhData.where((item) {
       String createdAt = item['createdAt'] ?? '';
-      return createdAt.toLowerCase().contains(filterText);
+      String complaint = item['complaint'] ?? '';
+      return createdAt.toLowerCase().contains(filterText) ||
+          complaint.toLowerCase().contains(filterText);
     }).toList();
 
-    // Sort data based on 'createdAt'
     filteredData.sort((a, b) {
       DateTime? dateA;
       DateTime? dateB;
@@ -336,7 +366,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       backgroundImage: NetworkImage(historyItem['imageUrl']),
                     ),
                     title: Text(
-                        formattedDate,
+                        historyItem['date'],
                         style: const TextStyle(
                           fontSize: 14
                         ),

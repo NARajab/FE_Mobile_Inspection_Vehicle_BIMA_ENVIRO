@@ -229,7 +229,7 @@ class BulldozerTemplateState extends State<BulldozerTemplate> {
                               ),
                             ),
                           ),
-                          if (role == 'Forman') ...[
+                          if (widget.role == 'Forman') ...[
                             Padding(
                               padding: const EdgeInsets.all(12.0),
                               child: Column(

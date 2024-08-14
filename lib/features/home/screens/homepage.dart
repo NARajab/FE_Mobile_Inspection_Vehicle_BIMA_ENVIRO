@@ -44,15 +44,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             title: Image.asset('assets/images/appbar.png', height: 35),
             automaticallyImplyLeading: false,
             toolbarHeight: 35,
-            actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_outlined),
-              iconSize: 30,
-              color: Colors.black,
-              onPressed: () {
-              },
-            ),
-          ],
+
           ),
         ),
       ),
@@ -206,11 +198,14 @@ class _HomePageContentState extends State<HomePageContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  formattedDate,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    formattedDate,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),

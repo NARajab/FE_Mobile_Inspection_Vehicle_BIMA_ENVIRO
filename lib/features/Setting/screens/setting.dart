@@ -39,34 +39,41 @@ class _SettingScreenState extends State<SettingScreen> {
           profileImageUrl = userData['user']['imageUrl'] ?? 'No Image';
         });
       } catch (e) {
-        // Handle the error appropriately, maybe show an error message
         print('Error loading profile: $e');
       }
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileHeader(),
-            const SizedBox(height: 20),
-            _buildOptionCard(context, 'Profile', 'assets/images/profile.png', () => _onProfileTap(context)),
-            _buildOptionCard(context, 'Change Password', 'assets/images/cp.png', () => _onChangePasswordTap(context)),
-            _buildOptionCard(context, 'Logout', 'assets/images/logout.png', () => _onLogoutTap(context)),
-          ],
-        ),
+      body: ListView(
+        padding: const EdgeInsets.all(16.0),
+        children: [
+          _buildProfileHeader(),
+          const SizedBox(height: 20),
+          _buildOptionCard(context, 'Profile', 'assets/images/profile.png', () => _onProfileTap(context)),
+          _buildOptionCard(context, 'Change Password', 'assets/images/cp.png', () => _onChangePasswordTap(context)),
+          _buildOptionCard(context, 'Logout', 'assets/images/logout.png', () => _onLogoutTap(context)),
+        ],
       ),
     );
   }
 
   Widget _buildProfileHeader() {
-    return Padding(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.0),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6.0,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
@@ -76,19 +83,14 @@ class _SettingScreenState extends State<SettingScreen> {
                 ? FileImage(profileImageFile!)
                 : NetworkImage(profileImageUrl) as ImageProvider,
           ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                username ?? 'Loading...',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                email ?? 'Loading...',
-                style: const TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            ],
+          const SizedBox(height: 12),
+          Text(
+            username,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            email,
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ],
       ),
@@ -98,21 +100,27 @@ class _SettingScreenState extends State<SettingScreen> {
   Widget _buildOptionCard(BuildContext context, String title, String imagePath, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        elevation: 4,
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Image.asset(imagePath, width: 30, height: 30),
-              const SizedBox(width: 16),
-              Text(
-                title,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ],
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        decoration: BoxDecoration(
+          color: Colors.white, // Set background color of the option card to white
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 6.0,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: ListTile(
+          leading: Image.asset(imagePath, width: 30, height: 30),
+          title: Text(
+            title,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
+          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+          contentPadding: const EdgeInsets.all(16.0),
         ),
       ),
     );
@@ -127,7 +135,7 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   void _onLogoutTap(BuildContext context) {
-    Flushbar(
+    Flushbar flushbar = Flushbar(
       title: "Logout",
       message: "Are you sure you want to logout?",
       duration: null,
@@ -157,25 +165,41 @@ class _SettingScreenState extends State<SettingScreen> {
       ),
       isDismissible: true,
       flushbarStyle: FlushbarStyle.FLOATING,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       borderRadius: BorderRadius.circular(8),
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.black54,
       icon: const Icon(
         Icons.warning,
         size: 28.0,
-        color: Colors.yellow,
+        color: Colors.red,
       ),
-      leftBarIndicatorColor: Colors.yellow,
-    ).show(context);
+      leftBarIndicatorColor: Colors.red,
+    );
+
+    // Show the Flushbar within a Stack to center it
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Stack(
+          children: [
+            Positioned(
+              left: 16,
+              right: 16,
+              top: MediaQuery.of(context).size.height * 0.4,
+              child: Center(
+                child: flushbar,
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
 
   void _logout(BuildContext context) async {
-    // Remove the token from SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
 
-    // Navigate to the login page
     Navigator.pushNamedAndRemoveUntil(
       context,
       '/login',
