@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:myapp/features/Setting/services/settings_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'edit_profile.dart';
@@ -59,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           fontSize: 20,
           fontWeight: FontWeight.w400,
         ),
-        toolbarHeight: 45,
+        toolbarHeight: 60,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
@@ -110,32 +110,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: profileImageFile != null
-                  ? FileImage(profileImageFile!)
-                  : NetworkImage(profileImageUrl) as ImageProvider,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              username,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              email,
-              style: const TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              phoneNumber,
-              style: const TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-          ],
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Ensure the column sizes to its content
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 60,
+                backgroundImage: profileImageFile != null
+                    ? FileImage(profileImageFile!)
+                    : NetworkImage(profileImageUrl) as ImageProvider,
+                backgroundColor: Colors.grey[200],
+                child: profileImageFile == null && profileImageUrl.isEmpty
+                    ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                    : null,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                username,
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF304FFE),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                email,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[700],
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                phoneNumber,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey[700],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

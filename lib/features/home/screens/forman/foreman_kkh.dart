@@ -152,8 +152,9 @@ class _ForemanKkhState extends State<ForemanKkh> {
             .where((item) {
           final createdAt = item['createdAt']?.toLowerCase() ?? '';
           final userName = item['User']['name']?.toLowerCase() ?? '';
+          final complaint = item['complaint']?.toLowerCase() ?? '';
           return createdAt.contains(filterText) ||
-              userName.contains(filterText);
+              userName.contains(filterText) || complaint.contains(filterText);
         })
             .map((item) => _buildCard(context, item))
             .toList(),
@@ -163,16 +164,14 @@ class _ForemanKkhState extends State<ForemanKkh> {
 
   Widget _buildCard(BuildContext context, Map<String, dynamic> item) {
     final createdAt = item['createdAt'];
+    final date = item['date'];
     final userName = item['User']['name'];
     final complaint = item['complaint'];
 
-    if (createdAt == null || userName == null) {
-      return const SizedBox(); // Return an empty widget if data is missing
+    if (createdAt == null || userName == null || complaint == null) {
+      return const SizedBox();
     }
 
-    final formattedDate = DateFormat('dd MMMM yyyy').format(
-      DateTime.parse(createdAt),
-    );
 
     Color complaintColor;
     switch (complaint) {
@@ -212,7 +211,7 @@ class _ForemanKkhState extends State<ForemanKkh> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('$formattedDate - $userName'),
+              Text('$date - $userName'),
               Container(
                 width: 10,
                 height: 10,

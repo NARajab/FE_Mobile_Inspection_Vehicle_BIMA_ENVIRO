@@ -14,6 +14,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   TextEditingController oldPasswordController = TextEditingController();
   TextEditingController newPasswordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
+
+  bool _oldPasswordVisible = false;
+  bool _newPasswordVisible = false;
+  bool _confirmPasswordVisible = false;
+
   final ProfileServices _profileServices = ProfileServices();
 
   @override
@@ -79,8 +84,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Password'),
         backgroundColor: const Color(0xFF304FFE),
+        title: const Text('Change Password'),
         elevation: 5,
         shadowColor: Colors.black,
         titleTextStyle: const TextStyle(
@@ -88,7 +93,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           fontSize: 20,
           fontWeight: FontWeight.w400,
         ),
-        toolbarHeight: 45,
+        toolbarHeight: 60,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
@@ -108,52 +113,91 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: oldPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Old Password',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildPasswordField(
+              controller: oldPasswordController,
+              label: 'Old Password',
+              isVisible: _oldPasswordVisible,
+              onVisibilityToggle: () {
+                setState(() {
+                  _oldPasswordVisible = !_oldPasswordVisible;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            _buildPasswordField(
+              controller: newPasswordController,
+              label: 'New Password',
+              isVisible: _newPasswordVisible,
+              onVisibilityToggle: () {
+                setState(() {
+                  _newPasswordVisible = !_newPasswordVisible;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            _buildPasswordField(
+              controller: confirmPasswordController,
+              label: 'Confirm New Password',
+              isVisible: _confirmPasswordVisible,
+              onVisibilityToggle: () {
+                setState(() {
+                  _confirmPasswordVisible = !_confirmPasswordVisible;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: changePassword,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF304FFE),
+                textStyle: const TextStyle(
+                  fontSize: 18,
                 ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: newPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'New Password',
+                foregroundColor: Colors.white,
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                obscureText: true,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 22),
+                minimumSize: const Size(double.infinity, 50), // Ensures button width is consistent
               ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm New Password',
-                ),
-                obscureText: true,
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: changePassword,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF304FFE),
-                  textStyle: const TextStyle(
-                    fontSize: 18,
-                  ),
-                  foregroundColor: Colors.white,
-                  elevation: 5,
-                ),
-                child: const Text('Change Password'),
-              ),
-            ],
-          ),
+              child: const Text('Change'),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required bool isVisible,
+    required VoidCallback onVisibilityToggle,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        suffixIcon: IconButton(
+          icon: Icon(
+            isVisible ? Icons.visibility : Icons.visibility_off,
+          ),
+          onPressed: onVisibilityToggle,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        filled: true,
+        fillColor: Colors.grey[200],
+      ),
+      obscureText: !isVisible,
+      style: const TextStyle(fontSize: 16),
     );
   }
 }

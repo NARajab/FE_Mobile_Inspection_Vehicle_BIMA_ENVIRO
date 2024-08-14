@@ -31,6 +31,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   TextEditingController phoneNumberController = TextEditingController();
   String? newProfileImageUrl;
   File? newProfileImage;
+  bool isLoading = false; // Add a boolean to track the loading state
 
   @override
   void initState() {
@@ -60,6 +61,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> saveChanges() async {
+    setState(() {
+      isLoading = true; // Set loading state to true
+    });
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('token');
 
@@ -77,10 +82,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         // Show success notification
         _showFlushbar('Success', 'Profile updated successfully.', isSuccess: true);
 
-        // Delay the navigation slightly to allow the Flushbar to finish its animation
         await Future.delayed(const Duration(milliseconds: 2000));
 
-        // Return the edited data to the previous screen
         Map<String, dynamic> editedData = {
           'username': usernameController.text,
           'email': emailController.text,
@@ -88,15 +91,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           'profileImageUrl': widget.currentProfileImageUrl,
           'profileImageFile': newProfileImage,
         };
+        Navigator.pop(context, editedData);
       } catch (e) {
-        // Show error notification
         _showFlushbar('Error', 'Failed to update profile: $e');
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
       }
-
-
     }
   }
-
 
   void _showFlushbar(String title, String message, {bool isSuccess = false}) {
     Flushbar(
@@ -105,6 +109,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       duration: const Duration(seconds: 3),
       backgroundColor: isSuccess ? Colors.green : Colors.red,
       flushbarPosition: FlushbarPosition.TOP,
+      borderRadius: BorderRadius.circular(8),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
     ).show(context);
 
     if (isSuccess) {
@@ -127,7 +134,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           fontSize: 20,
           fontWeight: FontWeight.w400,
         ),
-        toolbarHeight: 45,
+        toolbarHeight: 60,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
@@ -147,65 +154,98 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            GestureDetector(
-              onTap: pickImage,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundImage: newProfileImage != null
-                    ? FileImage(newProfileImage!)
-                    : NetworkImage(newProfileImageUrl!) as ImageProvider,
-                child: const Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                  size: 30,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                GestureDetector(
+                  onTap: pickImage,
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundImage: newProfileImage != null
+                            ? FileImage(newProfileImage!)
+                            : NetworkImage(newProfileImageUrl!) as ImageProvider,
+                        backgroundColor: Colors.grey[200],
+                        child: newProfileImage == null && newProfileImageUrl!.isEmpty
+                            ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                            : null,
+                      ),
+                      Container(
+                        margin: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.camera_alt, color: Color(0xFF304FFE)),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: usernameController,
-              decoration: const InputDecoration(
-                labelText: 'Username',
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: phoneNumberController,
-              decoration: const InputDecoration(
-                labelText: 'Phone Number',
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: saveChanges,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF304FFE),
-                textStyle: const TextStyle(
-                  fontSize: 18,
+                const SizedBox(height: 20),
+                _buildTextField(controller: usernameController, label: 'Username'),
+                const SizedBox(height: 10),
+                _buildTextField(controller: emailController, label: 'Email'),
+                const SizedBox(height: 10),
+                _buildTextField(controller: phoneNumberController, label: 'Phone Number'),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: saveChanges,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF304FFE),
+                    textStyle: const TextStyle(
+                      fontSize: 18,
+                    ),
+                    foregroundColor: Colors.white,
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 22),
+                  ),
+                  child: const Text('Update'),
                 ),
-                foregroundColor: Colors.white,
-                elevation: 5,
-              ),
-              child: const Text('Update'),
+              ],
             ),
-          ],
-        ),
+          ),
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF304FFE),
+              ),
+            ),
+        ],
       ),
     );
   }
-  void _navigateBack(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/profile');
+
+  Widget _buildTextField({required TextEditingController controller, required String label}) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF304FFE)),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
   }
 }
