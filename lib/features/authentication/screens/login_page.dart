@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     } catch (e) {
       print("Exception occurred: $e");
       Flushbar(
-        message: 'Exception: $e',
+        message: 'No Internet Connection',
         duration: const Duration(seconds: 3),
         backgroundColor: Colors.red,
         flushbarPosition: FlushbarPosition.TOP,

@@ -1,4 +1,7 @@
+import 'dart:ffi';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:another_flushbar/flushbar.dart';
@@ -166,27 +169,32 @@ class P2hExScreenState extends State<P2hExScreen> {
     if (token != null) {
       FormServices formServices = FormServices();
       try {
-        await formServices.submitP2hEx(requestData, token);
-        Flushbar(
-          title: 'Success',
-          message: 'Data submitted successfully!',
-          duration: const Duration(seconds: 3),
-          backgroundColor: Colors.green,
-        ).show(context).then((_) {
-          _navigateBack(context);
-        });
+        final response = await formServices.submitP2hEx(requestData, token);
 
-        textEditingController.clear();
-        modelUnitController.clear();
-        nomorUnitController.clear();
-        shiftController.clear();
-        hmAwalController.clear();
-        hmAkhirController.clear();
+        if (response['status'] == 'success') {
+          Flushbar(
+            title: 'Success',
+            message: 'Data submitted successfully!',
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.green,
+          ).show(context).then((_) {
+            _navigateBack(context);
+          });
+
+          textEditingController.clear();
+          modelUnitController.clear();
+          nomorUnitController.clear();
+          shiftController.clear();
+          hmAwalController.clear();
+          hmAkhirController.clear();
+        } else {
+          throw Exception(response['message']);
+        }
       } catch (error) {
         Flushbar(
           title: 'Error',
           message: 'Failed to submit data: $error',
-          duration: const Duration(seconds: 3),
+          duration: const Duration(seconds: 3000),
           backgroundColor: Colors.red,
         ).show(context);
       }
@@ -259,23 +267,6 @@ class P2hExScreenState extends State<P2hExScreen> {
     );
   }
 
-  Widget _buildNotesSection() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: importantNotes.map((note) {
-            return Text(
-              note,
-              style: const TextStyle(fontSize: 16),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -299,7 +290,7 @@ class P2hExScreenState extends State<P2hExScreen> {
           },
         ),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(6),
+          preferredSize: const ui.Size.fromHeight(6),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Container(
@@ -374,6 +365,23 @@ class P2hExScreenState extends State<P2hExScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNotesSection() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: importantNotes.map((note) {
+            return Text(
+              note,
+              style: const TextStyle(fontSize: 16),
+            );
+          }).toList(),
         ),
       ),
     );

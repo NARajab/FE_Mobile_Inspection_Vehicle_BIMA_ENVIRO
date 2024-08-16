@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/history/services/p2h_services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/p2h_foreman_services.dart';
 import 'package:another_flushbar/flushbar.dart';
 
@@ -13,6 +14,7 @@ class NoteScreen extends StatefulWidget {
 }
 
 class _NoteScreenState extends State<NoteScreen> {
+  final P2hHistoryServices _p2hHistoryServices = P2hHistoryServices();
   late Future<Map<String, dynamic>> _p2hData;
   final TextEditingController _aroundUnitController = TextEditingController();
   final TextEditingController _inTheCabinController = TextEditingController();
@@ -22,7 +24,24 @@ class _NoteScreenState extends State<NoteScreen> {
   @override
   void initState() {
     super.initState();
-    _p2hData = P2hHistoryServices().getP2hById(widget.p2hId);
+    _fetchP2hData();
+  }
+
+  Future<void> _fetchP2hData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token != null) {
+      setState(() {
+        _p2hData = _p2hHistoryServices.getP2hById(widget.p2hId, token);
+      });
+    } else {
+      Flushbar(
+        title: 'Error',
+        message: 'Failed to validate',
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.red,
+      ).show(context);
+    }
   }
 
   @override

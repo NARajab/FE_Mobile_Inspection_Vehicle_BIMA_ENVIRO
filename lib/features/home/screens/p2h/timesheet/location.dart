@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/features/home/screens/p2h/timesheet/timesheet.dart';
 import '../../../services/p2h_services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:another_flushbar/flushbar.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -17,6 +18,83 @@ class _LocationScreenState extends State<LocationScreen> {
   final TextEditingController locationController = TextEditingController();
   final TextEditingController fuelController = TextEditingController();
   final TextEditingController fuelhmController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationFilled();
+  }
+
+  Future<String?> _getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    if (token == null) {
+      return null;
+    }
+
+    try {
+      final decodedToken = JwtDecoder.decode(token);
+      final userId = decodedToken['id'];
+
+      return userId is int ? userId.toString() : userId as String?;
+    } catch (e) {
+      print("Error decoding token: $e");
+      return null;
+    }
+  }
+
+  Future<int?> _getLocationId(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('locationId_$userId');
+  }
+
+  Future<bool> _isLocationCreatedWithin13Hours(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? timestamp = prefs.getInt('locationCreatedTimestamp_$userId');
+    if (timestamp == null) {
+      return false;
+    }
+
+    final DateTime savedTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    final DateTime currentTime = DateTime.now();
+    final Duration difference = currentTime.difference(savedTime);
+
+    // Check if 13 hours have passed
+    if (difference.inHours >= 13) {
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<void> _checkLocationFilled() async {
+    final userId = await _getUserId();
+
+    if (userId == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
+
+    final bool isLocationCreatedWithin13Hours = await _isLocationCreatedWithin13Hours(userId);
+
+    if (isLocationCreatedWithin13Hours) {
+      final int? locationId = await _getLocationId(userId);
+      if (locationId != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TimesheetScreen(locationId: locationId),
+          ),
+        );
+      } else {
+        print("Location ID is null");
+      }
+    } else {
+      // Show message that the user must wait 13 hours before creating a new location
+      _showErrorFlushbar('You must wait 13 hours before creating a new location.');
+    }
+  }
+
 
   Widget _buildTextField(
       TextEditingController controller,
@@ -38,6 +116,12 @@ class _LocationScreenState extends State<LocationScreen> {
   Future<void> _submitData() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token') ?? '';
+    final userId = await _getUserId(); // Ambil userId dari token
+
+    if (userId == null) {
+      Navigator.pushReplacementNamed(context, '/login');
+      return;
+    }
 
     final requestData = {
       'pit': pitController.text,
@@ -51,10 +135,13 @@ class _LocationScreenState extends State<LocationScreen> {
       final response = await TimesheetServices().submitLocation(requestData, token);
       final int locationId = response['lokasi']['id'];
 
+      await prefs.setBool('isLocationFilled_$userId', true);
+      await prefs.setInt('locationCreatedTimestamp_$userId', DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt('locationId_$userId', locationId);
+
       _showSuccessFlushbar();
       _clearFields();
 
-      // Navigate to TimesheetScreen with the new location ID
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -76,7 +163,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void _showSuccessFlushbar() {
     Flushbar(
-      message: 'Data submitted successfully',
+      message: 'Data berhasil dikirim',
       duration: const Duration(seconds: 3),
       backgroundColor: Colors.green,
     ).show(context);
@@ -92,17 +179,12 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   void dispose() {
-    // Dispose controllers to free up resources
     pitController.dispose();
     disposalController.dispose();
     locationController.dispose();
     fuelController.dispose();
     fuelhmController.dispose();
     super.dispose();
-  }
-
-  void _navigateBack(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/p2h');
   }
 
   @override
@@ -123,7 +205,7 @@ class _LocationScreenState extends State<LocationScreen> {
           icon: const Icon(Icons.arrow_back_ios_new),
           color: Colors.white,
           onPressed: () {
-            _navigateBack(context);
+            Navigator.pop(context);
           },
         ),
         bottom: PreferredSize(
@@ -156,26 +238,10 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
               _buildTextField(fuelhmController, 'HM'),
               _buildTextField(fuelController, 'FUEL'),
-              const SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 7),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ElevatedButton(
-                      onPressed: _submitData,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF304FFE),
-                        textStyle: const TextStyle(
-                          fontSize: 18,
-                        ),
-                        foregroundColor: Colors.white,
-                        elevation: 5,
-                      ),
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 25),
+              ElevatedButton(
+                onPressed: _submitData,
+                child: const Text('Kirim'),
               ),
             ],
           ),

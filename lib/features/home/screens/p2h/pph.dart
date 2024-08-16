@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/features/home/screens/p2h/timesheet/location.dart';
-import 'pph_bl.dart';
-import 'pph_bs.dart';
-import 'pph_dt.dart';
-import 'pph_lv.dart';
-import 'pph_ex.dart';
-import '../homepage.dart';
+import 'package:myapp/features/home/screens/p2h/timesheet/timesheet.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class P2hScreen extends StatelessWidget {
   final List<Map<String, dynamic>> items = [
@@ -47,6 +43,68 @@ class P2hScreen extends StatelessWidget {
   ];
 
   P2hScreen({super.key});
+
+  Future<bool> _isLocationDataValid() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? timestamp = prefs.getInt('locationFilledTimestamp');
+    if (timestamp == null) {
+      return false;
+    }
+
+    final DateTime savedTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    final DateTime currentTime = DateTime.now();
+    final Duration difference = currentTime.difference(savedTime);
+
+    if (difference.inHours > 15) {
+      await prefs.remove('isLocationFilled');
+      await prefs.remove('locationFilledTimestamp');
+      return false;
+    }
+
+    return prefs.getBool('isLocationFilled') ?? false;
+  }
+
+
+  Future<int?> _getLocationId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('locationId'); // Retrieve the locationId if it's set
+  }
+
+  void _navigateToTimesheetOrLocation(BuildContext context) async {
+    bool isLocationFilled = await _isLocationDataValid();
+
+    if (isLocationFilled == true) {
+      print('isLocationFilled is true');
+      int? locationId = await _getLocationId();
+
+      if (locationId != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TimesheetScreen(locationId: locationId), // Pass the locationId
+          ),
+        );
+      } else {
+        print('isLocationFilled is false');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LocationScreen(), // Navigate to location form as a fallback
+          ),
+        );
+      }
+    } else {
+      // Navigate to LocationScreen if location is not filled
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LocationScreen(), // Navigate to location form
+        ),
+      );
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +150,9 @@ class P2hScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              if (items[index].containsKey('id')) {
+              if (items[index]['title'] == 'Timesheet') {
+                _navigateToTimesheetOrLocation(context);
+              } else if (items[index].containsKey('id')) {
                 Navigator.pushNamed(
                   context,
                   items[index]['route']!,
@@ -143,24 +203,5 @@ class P2hScreen extends StatelessWidget {
 
   void _navigateBack(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/home');
-  }
-
-  Widget _getNextScreen(String route, int id) {
-    switch (route) {
-      case '/blForm':
-        return P2hBlScreen(id: id);
-      case '/dtForm':
-        return P2hDtScreen(id: id);
-      case '/exForm':
-        return P2hExScreen(id: id);
-      case '/lvForm':
-        return P2hLvScreen(id: id);
-      case '/bsForm':
-        return P2hBsScreen(id: id);
-      case '/location':
-        return const LocationScreen();
-      default:
-        return const HomePage();
-    }
   }
 }

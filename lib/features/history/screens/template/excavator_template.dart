@@ -30,9 +30,26 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
   @override
   void initState() {
     super.initState();
-    _p2hData = _p2hHistoryServices.getP2hById(widget.p2hId);
     _operatorName = _getOperatorName();
   }
+
+  Future<Map<String, dynamic>> _fetchP2hData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    print(token);
+
+    if (token == null) {
+      print('token error');
+      throw Exception('Token not found');
+    }
+
+    try {
+      return await _p2hHistoryServices.getP2hById(widget.p2hId, token);
+    } catch (e) {
+      throw Exception('$token: $e');
+    }
+  }
+
 
   Future<String> _getOperatorName() async {
     final prefs = await SharedPreferences.getInstance();
@@ -78,7 +95,7 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>>(
-      future: _p2hData,
+      future: _fetchP2hData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -88,8 +105,10 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
           return const Center(child: Text('No data available'));
         } else {
           final data = snapshot.data!;
-          final pph = data['Pph'] as Map<String, dynamic>;
+          print(data);
+          final pph = data['p2h'] as Map<String, dynamic>;
           final vehicle = pph['Vehicle'] as Map<String, dynamic>;
+          final location = data['location'] as Map<String, dynamic>;
 
           // Extract the conditions
           final conditions = {
@@ -132,8 +151,7 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 8),
-                                _buildDetailRow(
-                                    'Model Unit', vehicle['type'] ?? 'Unknown'),
+                                _buildDetailRow('Model Unit', pph['modelu'] ?? 'Unknown'),
                                 _buildDetailRow(
                                     'No Unit', pph['nou'] ?? 'Unknown'),
                                 _buildDetailRow(
@@ -269,13 +287,7 @@ class _ExcavatorTemplateState extends State<ExcavatorTemplate> {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              var idLocation = pph['idLocation'];
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => TimesheetTemplate(idLocation: idLocation),
-                              //   ),
-                              // );
+                              var idLocation = location['id'];
                               if (idLocation != null) {
                                 Navigator.push(
                                   context,

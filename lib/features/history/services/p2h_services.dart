@@ -26,13 +26,16 @@ class P2hHistoryServices{
     }
   }
 
-  Future <Map<String, dynamic>> getP2hById(int p2hId) async {
+  Future <Map<String, dynamic>> getP2hById(int p2hId, String token) async {
     const String endpoint = '/p2h/';
     final String apiUrl = '$baseUrl$endpoint$p2hId';
 
     try{
       final response = await http.get(
-        Uri.parse(apiUrl)
+        Uri.parse(apiUrl),
+          headers: {
+            'Authorization': 'Bearer $token',
+          }
       );
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
